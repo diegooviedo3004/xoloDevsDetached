@@ -8,6 +8,7 @@ import ThemeBtn from '../components/ThemeBtn';
 import { useDispatch } from 'react-redux';
 import { closeDrawer } from '../redux/actions/drawerAction';
 import { GlobalStyleSheet } from '../constants/StyleSheet';
+import {useAuthStore} from "../store/useAuthStore";
 
 const MenuItems = [
     {
@@ -80,7 +81,9 @@ const DrawerMenu = () => {
     
 
     const { colors } : {colors : any} = theme;
-
+    const {
+        logout
+    } = useAuthStore();
    const [active, setactive] = useState(MenuItems[0]);
 
     const navigation = useNavigation<any>();
@@ -124,34 +127,42 @@ const DrawerMenu = () => {
                     </TouchableOpacity>
                 </View>
                 <View style={{paddingBottom:10}}>
-                    {MenuItems.map((data:any,index:any) => {
-                        return(
+                    {MenuItems.map((data: any, index: any) => {
+                        return (
                             <TouchableOpacity
                                 activeOpacity={0.8}
-                                onPress={() => {data.navigate === "DrawerNavigation" ? dispatch(closeDrawer()) : dispatch(closeDrawer()); navigation.navigate(data.navigate)}}
+                                onPress={() => {
+                                    if (data.id === '9') {
+                                        // Ejecutar logout si el id es '9'
+                                        logout();
+                                    } else {
+                                        // Cerrar el drawer y navegar a la ruta correspondiente
+                                        dispatch(closeDrawer());
+                                        navigation.navigate(data.navigate);
+                                    }
+                                }}
                                 key={index}
-                                style={[GlobalStyleSheet.flex,{
-                                    paddingVertical:5,
-                                    marginBottom:0,
+                                style={[GlobalStyleSheet.flex, {
+                                    paddingVertical: 5,
+                                    marginBottom: 0,
                                 }]}
                             >
-                                <View style={{flexDirection:'row',alignItems:'center',gap:20}}>
-                                    <View style={{height:45,width:45,borderRadius:10,alignItems:'center',justifyContent:'center'}}>
+                                <View style={{flexDirection:'row', alignItems:'center', gap:20}}>
+                                    <View style={{height:45, width:45, borderRadius:10, alignItems:'center', justifyContent:'center'}}>
                                         <Image
                                             source={data.icon}
                                             style={{
-                                                height:24,
-                                                width:24,
-                                                tintColor:data.id == '9' ? '#FF8484' :data.id === '0' ? COLORS.primary : '#BDBDBD',
-                                                //marginRight:14,
-                                                resizeMode:'contain'
+                                                height: 24,
+                                                width: 24,
+                                                tintColor: data.id == '9' ? '#FF8484' : data.id === '0' ? COLORS.primary : '#BDBDBD',
+                                                resizeMode: 'contain'
                                             }}
                                         />
                                     </View>
-                                    <Text style={[FONTS.fontRegular,{color:colors.title,fontSize:16,opacity:.6},data.id === '0' && {...FONTS.fontSemiBold,fontSize:16,color:COLORS.primary}]}>{data.name}</Text>
+                                    <Text style={[FONTS.fontRegular, { color: colors.title, fontSize: 16, opacity: .6 }, data.id === '0' && { ...FONTS.fontSemiBold, fontSize: 16, color: COLORS.primary }]}>{data.name}</Text>
                                 </View>
                             </TouchableOpacity>
-                        )
+                        );
                     })}
                 </View>
                 <View style={{paddingHorizontal:10}}>
