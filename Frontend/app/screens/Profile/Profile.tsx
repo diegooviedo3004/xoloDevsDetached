@@ -20,7 +20,7 @@ const profileData = [
         id:"2",
         image:IMAGES.email,
         title:'Correo Electronico',
-        subtitle:"wiliamSmith@gmail.com"
+        subtitle:"vendetuvaca@gmail.com"
     },
     {
         id:"3",
@@ -33,13 +33,13 @@ const profileData = [
 const profilecartData = [
     {
         id:"1",
-        title: "Creamy Latte\nCoffee",
+        title: "Razas \nGuernsey",
         subtitle:"Beverages",
         image:IMAGES.vacasCards1
     },
     {
         id:"2",
-        title: "Ombe Ice Coffee \n Latte",
+        title: "Razas Holstein \n Frisona",
         subtitle:"Beverages",
         image:IMAGES.vacasCards2
     },
@@ -70,7 +70,7 @@ const Profile = ({navigation} : ProfileScreenProps) => {
                         source={IMAGES.small6}
                     />
                 </View>
-                <Text style={{...FONTS.fontSemiBold,fontSize:28,color:colors.title}}>William Smith</Text>
+                <Text style={{...FONTS.fontSemiBold,fontSize:28,color:colors.title}}>Ernesto Vargas</Text>
                 <Text style={{...FONTS.fontRegular,fontSize:16,color:COLORS.primary}}>Jinotega, Finca Santa Teresa</Text>
             </View>
             <View 

@@ -93,8 +93,8 @@ export const Home = ({ navigation }: HomeScreenProps) => {
                 <View style={[GlobalStyleSheet.container, { paddingHorizontal: 30,padding:0,paddingTop:30 }]}>
                     <View style={[GlobalStyleSheet.flex]}>
                         <View>
-                            <Text style={{ ...FONTS.fontRegular, fontSize: 14, color: colors.title }}>Good Morning</Text>
-                            <Text style={{ ...FONTS.fontSemiBold, fontSize: 24, color: colors.title }}>Williams</Text>
+                            <Text style={{ ...FONTS.fontRegular, fontSize: 14, color: colors.title }}>Buenas Noches</Text>
+                            <Text style={{ ...FONTS.fontSemiBold, fontSize: 24, color: colors.title }}>Ernesto Vargas</Text>
                         </View>
                         <View style={{flexDirection:'row',alignItems:'center'}}>
                             <TouchableOpacity
@@ -170,7 +170,7 @@ export const Home = ({ navigation }: HomeScreenProps) => {
                                     return (
                                         <TouchableOpacity
                                             activeOpacity={0.8}
-                                            onPress={() => {navigation.navigate('Products'); }}
+                                            // onPress={() => {navigation.navigate('Products'); }}
                                             key={index}
                                             style={[styles.arrivaldata,{
                                                 backgroundColor:theme.dark ? colors.background :colors.card,

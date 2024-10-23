@@ -14,61 +14,67 @@ const MenuItems = [
     {
         id:"0",
         icon: IMAGES.home,
-        name: "Home",
+        name: "Menu",
         navigate: "Home",
     },
-    {
-        id:"1",
-        icon: IMAGES.producta,
-        name: "Products",
-        navigate: "Products",
-    },
-    {
-        id:"2",
-        icon: IMAGES.components,
-        name: "Components",
-        navigate: "Components",
-    },
+    // {
+    //     id:"1",
+    //     icon: IMAGES.producta,
+    //     name: "Products",
+    //     navigate: "Products",
+    // },
+    // {
+    //     id:"2",
+    //     icon: IMAGES.components,
+    //     name: "Components",
+    //     navigate: "Components",
+    // },
+    // {
+    //     id:"3",
+    //     icon: IMAGES.star,
+    //     name: "Featured",
+    //     navigate: "Writereview",
+    // },
     {
         id:"3",
-        icon: IMAGES.star,
-        name: "Featured",
-        navigate: "Writereview",
+        icon: IMAGES.crear,
+        name: "Crear Publicacion",
+        navigate: "Create",
     },
     {
         id:"4",
         icon: IMAGES.heart,
-        name: "Wishlist",
+        name: "Lista de Deseo",
         navigate: "Wishlist",
     },
     {
         id:"5",
         icon: IMAGES.order,
-        name: "My Orders",
+        name: "Mi Ordenes",
         navigate: 'Myorder',
     },
     {
         id:"6",
         icon: IMAGES.shopping,
-        name: "My Cart",
+        name: "Mis Compras",
         navigate: 'MyCart',
     },
     {
         id:"7",
         icon: IMAGES.chat,
-        name: "Chat List",
+        name: "Mensajes",
         navigate: 'Chat',
     },
     {
         id:"8",
         icon: IMAGES.user3,
-        name: "Profile",
+        name: "Perfil",
         navigate: "Profile",
     },
     {
         id:"9",
         icon: IMAGES.logout,
-        name: "Logout",
+        name: "Salir",
         navigate: 'SingIn',
     },
 ]
@@ -118,7 +124,7 @@ const DrawerMenu = () => {
                         paddingBottom:20
                     }]}
                 >
-                    <Text style={{...FONTS.fontSemiBold,fontSize:20,color:colors.title}}>Main Menus</Text>
+                    <Text style={{...FONTS.fontSemiBold,fontSize:20,color:colors.title}}>Menús principales</Text>
                     <TouchableOpacity
                         onPress={() => dispatch(closeDrawer())}
                         activeOpacity={0.5}

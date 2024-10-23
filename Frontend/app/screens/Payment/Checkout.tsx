@@ -9,6 +9,7 @@ import { COLORS,FONTS } from '../../constants/theme';
 import Button from '../../components/Button/Button';
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../../navigation/RootStackParamList';
+import { Linking } from 'react-native';
 
 
 const checkoutData = [
@@ -25,6 +26,42 @@ const checkoutData = [
         navigate: "Payment"
     },
 ]
+
+
+const submitOrder = async () => {
+    try {
+        const response = await fetch("https://zany-happiness-x7wpxx47x5cv9r4-8000.app.github.dev/app/checkout-session/", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                my_domain: "https://diegooviedo3004.github.io/page/",
+                product_name: "Razas Guernsey",
+                product_price: 1200
+
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            // Verifica si la respuesta contiene la URL
+            if (data.url) {
+                // Abre la URL recibida para redirigir al usuario
+                Linking.openURL(data.url);
+            } else {
+                Alert.alert("Error", "No se recibió la URL para el pago.");
+            }
+        } else {
+            Alert.alert("Error", data.message || "Hubo un problema al enviar la orden");
+        }
+    } catch (error) {
+        Alert.alert("Error", "No se pudo conectar al servidor");
+        console.error(error);
+    }
+};
+
 
 type CheckoutScreenProps = StackScreenProps<RootStackParamList, 'Checkout'>;
 
@@ -59,7 +96,7 @@ const Checkout =  ({navigation} : CheckoutScreenProps) => {
                                             source={data.image}
                                         />
                                     </View>
-                                    <View style={{flex:1}}> 
+                                    <View style={{flex:1}}>
                                         <Text style={{ ...FONTS.fontRegular, fontSize: 14, color: colors.title }}>{data.title}</Text>
                                         <Text style={{ ...FONTS.fontLight, fontSize: 11, color: colors.text }}>{data.text}</Text>
                                     </View>
@@ -97,15 +134,16 @@ const Checkout =  ({navigation} : CheckoutScreenProps) => {
                 </View>
             </ScrollView>
             <View style={[GlobalStyleSheet.container]}>
-              
+
                     <Button
                         title='Submit Order'
                         color={COLORS.primary}
                         text={COLORS.card}
-                        onPress={() => navigation.navigate('Myorder')}
+                        onPress={submitOrder}
+                        // onPress={() => navigation.navigate('Myorder')}
                         style={{borderRadius:48}}
                     />
-               
+
             </View>
        </View>
     )

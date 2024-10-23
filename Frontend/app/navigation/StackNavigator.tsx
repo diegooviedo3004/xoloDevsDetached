@@ -57,7 +57,7 @@ import Tables from '../screens/Components/Tables';
 import Toggles from '../screens/Components/Toggles';
 import { useAuthStore } from '../store/useAuthStore';
 
-
+import CreateNavigation from '../screens/CreatePublic/create'
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -90,6 +90,7 @@ const StackNavigator = () => {
 					<>
 						<Stack.Screen name="DrawerNavigation" component={DrawerNavigation} />
 						<Stack.Screen name="BottomNavigation" component={BottomNavigation} />
+						<Stack.Screen name="Create" component={CreateNavigation} />
 						<Stack.Screen name="Notification" component={Notification} />
 						<Stack.Screen name="Search" component={Search} />
 						<Stack.Screen name="Products" component={Products} />

@@ -52,6 +52,7 @@ export type RootStackParamList = {
     Myorder: undefined;
     Notification: undefined;
     Home: undefined;
+    Create: undefined;
     Accordion: undefined;
     BottomSheet: undefined;
     ModalBox: undefined;

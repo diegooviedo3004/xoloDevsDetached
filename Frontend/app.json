@@ -1,14 +1,15 @@
 {
   "expo": {
     "name": "Mercado Ganadero",
-    "slug": "Mercado_Ganadero",
+    "slug": "mercado-ganadero",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/GanadoEnlineaV2.png",
     "userInterfaceStyle": "light",
+    "scheme": "mercadoganadero",
     "splash": {
       "image": "./assets/SplashScreen.png",
-      "resizeMode":"cover",
+      "resizeMode": "cover",
       "backgroundColor": "#70747D"
     },
     "assetBundlePatterns": [
@@ -25,23 +26,28 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/GanadoEnlineaV2.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.w3itexperts.ombe",
-      "permissions": ["ACCESS_FINE_LOCATION"],
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ],
       "config": {
         "googleMaps": {
           "apiKey": "YOUR_GOOGLE_MAPS_API_KEY"
         }
-      }
+      },
+      "displayName": "Mercado Ganadero"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "extra": {
       "eas": {
-        "projectId": "df01eda5-b046-4c48-9f97-6ea0e3e42927"
+        "projectId": "aeac2eab-b03a-43e0-b593-6c98f634c5a3"
       }
     },
     "plugins": [
@@ -54,11 +60,26 @@
         }
       ],
       [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your friends."
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ],
+      [
         "expo-screen-orientation",
         {
           "initialOrientation": "DEFAULT"
         }
       ]
-    ]
+    ],
+    "owner": "mercadoganadero"
   }
 }
