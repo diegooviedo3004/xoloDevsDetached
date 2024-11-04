@@ -1,7 +1,7 @@
 export const SignInViewModel = async (username: string | null, password: string | null) => {
     try {
         console.log("==> datos", username, password);
-        const req = await fetch(`http://192.168.1.12:8000/login/`, {
+        const req = await fetch(`http://192.168.100.4:8000/login/`, {
             method: "POST",
             headers: {
                 Accept: "application/json",

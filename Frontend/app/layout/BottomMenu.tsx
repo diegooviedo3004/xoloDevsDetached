@@ -32,7 +32,7 @@ const BottomMenu = ({state, navigation, descriptors}: Props) => {
     const [tabWidth, setWidth] = useState(wp('100%'));
 
     const tabWD =
-        tabWidth < SIZES.container ? tabWidth / 4 : SIZES.container / 4;
+        tabWidth < SIZES.container ? tabWidth / 5 : SIZES.container / 5;
 
     const circlePosition = useRef(
         new Animated.Value(0),
@@ -52,7 +52,7 @@ const BottomMenu = ({state, navigation, descriptors}: Props) => {
 
     const onTabPress = (index:any) => {
         const tabW =
-            tabWidth < SIZES.container ? tabWidth  / 4 : SIZES.container / 4; // Adjust this according to your tab width
+            tabWidth < SIZES.container ? tabWidth  / 5 : SIZES.container / 5; // Adjust this according to your tab width
 
         Animated.spring(circlePosition, {
             toValue: index * tabW,
@@ -92,7 +92,7 @@ const BottomMenu = ({state, navigation, descriptors}: Props) => {
                     <Animated.View style={{transform: [{translateX: circlePosition}]}}>
                         <View
                             style={{
-                                width: tabWidth < SIZES.container ? tabWidth / 4 : SIZES.container / 4,
+                                width: tabWidth < SIZES.container ? tabWidth / 5 : SIZES.container / 5,
                                 position: 'absolute',
                                 //backgroundColor:'red',
                                 zIndex: 1,
@@ -169,6 +169,7 @@ const BottomMenu = ({state, navigation, descriptors}: Props) => {
                                             source={
                                                 label === 'Home'    ?  IMAGES.Home:
                                                 label === 'Wishlist'   ?  IMAGES.heart2:
+                                                label === 'Create'  ?  IMAGES.plus:
                                                 label === 'MyCart'     ?  IMAGES.shopping:
                                                 label === 'Profile'  ?  IMAGES.user3 : IMAGES.Home
                                             }

@@ -34,11 +34,29 @@ const CardStyleData =[
     {
         id:"1",
         image:IMAGES.cerdoCards1,
-        title:"Holstein Frisona",
+        title:"Holstein",
         price:"$1300",
         countnumber:"590 kg",
     },
     {
+        id:"2",
+        image:IMAGES.vacasCards2,
+        title:"Landrace",
+        price:"$600",
+        countnumber:"320 kg",
+    },{
+        id:"2",
+        image:IMAGES.vacasCards2,
+        title:"Landrace",
+        price:"$600",
+        countnumber:"320 kg",
+    },{
+        id:"2",
+        image:IMAGES.vacasCards2,
+        title:"Landrace",
+        price:"$600",
+        countnumber:"320 kg",
+    },{
         id:"2",
         image:IMAGES.vacasCards2,
         title:"Landrace",
@@ -204,22 +222,23 @@ export const Home = ({ navigation }: HomeScreenProps) => {
                         </TouchableOpacity>
                     </View>
                 </View>
-                <View style={[GlobalStyleSheet.container,{paddingHorizontal:30}]}>
-                    {CardStyleData.map((data:any, index:any) => {
-                        return (
-                            <View key={index} style={{marginBottom:40}}>
-                                <Cardstyle4
-                                    id={data.id}
-                                    image={data.image}
-                                    price={data.price}
-                                    countnumber={data.countnumber} 
-                                    title={data.title}
-                                    onPress={() => navigation.navigate('ProductsDetails')}
-                                    onPress5={() => addItemToWishList(data)}                                
-                                />
-                            </View>
-                        );
-                    })}
+                <View style={[GlobalStyleSheet.container,{paddingHorizontal:30,flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between",  alignItems: "start" }]}>
+
+                        {CardStyleData.map((data:any, index:any) => {
+                            return (
+                                    <Cardstyle4
+                                        key={index}
+                                        id={data.id}
+                                        image={data.image}
+                                        price={data.price}
+                                        countnumber={data.countnumber}
+                                        title={data.title}
+                                        onPress={() => navigation.navigate('ProductsDetails')}
+                                        onPress5={() => addItemToWishList(data)}
+                                    />
+                            );
+                        })}
+
                 </View>
             </ScrollView>
         </View>
