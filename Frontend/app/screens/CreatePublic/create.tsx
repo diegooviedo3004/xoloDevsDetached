@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { StackScreenProps } from '@react-navigation/stack';
 import * as ImagePicker from 'expo-image-picker';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image, TextInput, Switch } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image, TextInput, Switch, ScrollViewProps  } from 'react-native';
 import {RootStackParamList} from "../../navigation/RootStackParamList";
 import Header from "../../layout/Header";
 import Input from "../../components/Input/Input";
 import {Button} from "react-native-paper";
 import {useAuthStore} from "../../store/useAuthStore";
+import {useTheme} from "@react-navigation/native";
+import {ProgressStep, ProgressSteps} from "@ouedraogof/react-native-progress-steps";
 
 type CreatePublicationScreenProps = StackScreenProps<RootStackParamList, 'Create'>
 
@@ -137,190 +139,101 @@ const CreatePublication  = ({ navigation }: CreatePublicationScreenProps) => {
         }
     };
 
+    // <Text style={styles.headerText}>Crear Publicación</Text>
+    //
+    // {/* Sección de Imágenes */}
+    // <View style={styles.imageSection}>
+    //     <Text style={styles.subHeaderText}>Imagen de publicación</Text>
+    //     <View style={styles.imageUpload}>
+    //         <Button onPress={pickImage} >Seleccionar imágenes</Button>
+    //     </View>
+    //     <ScrollView horizontal>
+    //         {images.map((imageUri, index) => (
+    //             <Image key={index} source={{ uri: imageUri }} style={styles.selectedImage} />
+    //         ))}
+    //     </ScrollView>
+    // </View>
+    //
+
+    const theme = useTheme();
+    const { colors }: { colors: any; } = theme;
+
+    const defaultScrollViewProps: ScrollViewProps = {
+        keyboardShouldPersistTaps: 'handled',
+        contentContainerStyle: {
+            flex: 1,
+            justifyContent: 'center',
+        },
+    };
+    const onNextStep = () => {
+        console.log('called next step');
+    };
+
+    const onPaymentStepComplete = () => {
+        alert('Payment step completed!');
+    };
+
+    const onPrevStep = () => {
+        console.log('called previous step');
+    };
+
+    const onSubmitSteps = () => {
+        console.log('called on submit step.');
+    };
 
 
     return (
-        <ScrollView style={styles.container}>
-            <Header
-                title='Crear Publicacion'
-                leftIcon='back'
-                //titleLeft
-                rightIcon1={'search'}
-            />
-            <Text style={styles.headerText}>Crear Publicación</Text>
-
-            {/* Sección de Imágenes */}
-            <View style={styles.imageSection}>
-                <Text style={styles.subHeaderText}>Imagen de publicación</Text>
-                <View style={styles.imageUpload}>
-                    <Button onPress={pickImage} >Seleccionar imágenes</Button>
-                </View>
-                <ScrollView horizontal>
-                    {images.map((imageUri, index) => (
-                        <Image key={index} source={{ uri: imageUri }} style={styles.selectedImage} />
-                    ))}
-                </ScrollView>
-            </View>
-
-            {/* Inputs para los campos del formulario */}
-            <Input
-                label="Nombre"
-                placeholder="Ingresa el nombre"
-                value={formData.title}
-                onChangeText={(text) => handleInputChange('title', text)}
-            />
-
-            <Input
-                label="Descripción"
-                placeholder="Descripción"
-                value={formData.description}
-                onChangeText={(text) => handleInputChange('description', text)}
-            />
-
-            <Input
-                label="Edad"
-                placeholder="Edad"
-                keyboardType="numeric"
-                value={formData.age}
-                onChangeText={(text) => handleInputChange('age', text)}
-            />
-
-            <Input
-                label="Peso"
-                placeholder="Peso"
-                keyboardType="numeric"
-                value={formData.weight}
-                onChangeText={(text) => handleInputChange('weight', text)}
-            />
-
-            <Input
-                label="Precio"
-                placeholder="Precio"
-                keyboardType="numeric"
-                value={formData.price}
-                onChangeText={(text) => handleInputChange('price', text)}
-            />
-
-            {/* Switches para los campos booleanos */}
-            <View style={styles.switchContainer}>
-                <Text>¿Activo?</Text>
-                <Switch
-                    value={formData.active}
-                    onValueChange={(value) => handleSwitchChange('active', value)}
-                />
-            </View>
-
-            <View style={styles.switchContainer}>
-                <Text>¿Vacunado?</Text>
-                <Switch
-                    value={formData.vaccinated}
-                    onValueChange={(value) => handleSwitchChange('vaccinated', value)}
-                />
-            </View>
-
-            <View style={styles.switchContainer}>
-                <Text>¿En venta?</Text>
-                <Switch
-                    value={formData.for_sale}
-                    onValueChange={(value) => handleSwitchChange('for_sale', value)}
-                />
-            </View>
-
-            {/* Fechas */}
-            <Input
-                label="Fecha de nacimiento"
-                placeholder="YYYY-MM-DD"
-                value={formData.birth_date}
-                onChangeText={(text) => handleInputChange('birth_date', text)}
-            />
-
-            <Input
-                label="Último parto"
-                placeholder="YYYY-MM-DD"
-                value={formData.last_parturition_date}
-                onChangeText={(text) => handleInputChange('last_parturition_date', text)}
-            />
-
-            <Input
-                label="Fecha esperada de parto"
-                placeholder="YYYY-MM-DD"
-                value={formData.expected_parturition_date}
-                onChangeText={(text) => handleInputChange('expected_parturition_date', text)}
-            />
-
-            <Input
-                label="Último celo"
-                placeholder="YYYY-MM-DD"
-                value={formData.last_heat_date}
-                onChangeText={(text) => handleInputChange('last_heat_date', text)}
-            />
-
-            <Input
-                label="Fecha de preñez"
-                placeholder="YYYY-MM-DD"
-                value={formData.pregnancy_date}
-                onChangeText={(text) => handleInputChange('pregnancy_date', text)}
-            />
-
-            <Input
-                label="Días de preñez"
-                placeholder="Días de preñez"
-                keyboardType="numeric"
-                value={formData.days_of_pregnancy}
-                onChangeText={(text) => handleInputChange('days_of_pregnancy', text)}
-            />
-
-            <Input
-                label="Producción de leche (L)"
-                placeholder="Producción de leche"
-                keyboardType="numeric"
-                value={formData.milk_production}
-                onChangeText={(text) => handleInputChange('milk_production', text)}
-            />
-
-            <Input
-                label="Días de lactancia"
-                placeholder="Días de lactancia"
-                keyboardType="numeric"
-                value={formData.days_of_lactation}
-                onChangeText={(text) => handleInputChange('days_of_lactation', text)}
-            />
-
-            <View style={styles.switchContainer}>
-                <Text>¿Aplicación de brucelosis?</Text>
-                <Switch
-                    value={formData.brucellosis_application}
-                    onValueChange={(value) => handleSwitchChange('brucellosis_application', value)}
-                />
-            </View>
-
-            <Input
-                label="ID de la madre"
-                placeholder="ID de la madre"
-                value={formData.mother}
-                onChangeText={(text) => handleInputChange('mother', text)}
-            />
-
-            <Input
-                label="Nombre del padre"
-                placeholder="Nombre del padre"
-                value={formData.father}
-                onChangeText={(text) => handleInputChange('father', text)}
-            />
-
-            <Input
-                label="Comentarios"
-                placeholder="Comentarios adicionales"
-                value={formData.comments}
-                onChangeText={(text) => handleInputChange('comments', text)}
-            />
-
-            {/* Botón para enviar el formulario */}
-            <TouchableOpacity style={styles.submitButton} onPress={submitForm}>
-                <Text style={styles.submitButtonText}>Crear Publicación</Text>
-            </TouchableOpacity>
-
-        </ScrollView>
+      <View style={{backgroundColor: colors.card, flex: 1 }}>
+          <Header
+              title='Crear Publicacion'
+              leftIcon={'back'}
+              rightIcon2={'home'}
+          />
+          <View style={{ flex: 1, marginTop: 50 }}>
+              <ProgressSteps>
+                  <ProgressStep
+                      label="Payment"
+                      onNext={onPaymentStepComplete}
+                      onPrevious={onPrevStep}
+                      scrollViewProps={defaultScrollViewProps}
+                  >
+                      <View style={{ alignItems: 'center' }}>
+                          <Text>Payment step content</Text>
+                      </View>
+                  </ProgressStep>
+                  <ProgressStep
+                      label="Shipping Address"
+                      onNext={onNextStep}
+                      onPrevious={onPrevStep}
+                      scrollViewProps={defaultScrollViewProps}
+                  >
+                      <View style={{ alignItems: 'center' }}>
+                          <Text>Shipping address step content</Text>
+                      </View>
+                  </ProgressStep>
+                  <ProgressStep
+                      label="Billing Address"
+                      onNext={onNextStep}
+                      onPrevious={onPrevStep}
+                      scrollViewProps={defaultScrollViewProps}
+                  >
+                      <View style={{ alignItems: 'center' }}>
+                          <Text>Billing address step content</Text>
+                      </View>
+                  </ProgressStep>
+                  <ProgressStep
+                      label="Confirm Order"
+                      onPrevious={onPrevStep}
+                      onSubmit={onSubmitSteps}
+                      scrollViewProps={defaultScrollViewProps}
+                  >
+                      <View style={{ alignItems: 'center' }}>
+                          <Text>Confirm order step content</Text>
+                      </View>
+                  </ProgressStep>
+              </ProgressSteps>
+          </View>
+      </View>
     );
 };
 
