@@ -1,12 +1,14 @@
 import { View, Text,  Image, TouchableOpacity, StyleSheet, ScrollView, TextInput } from 'react-native'
-import React, { useRef, useState } from 'react'
-import { useTheme } from '@react-navigation/native';
+import React, {useEffect, useRef, useState} from 'react'
+import {useRoute, useTheme} from '@react-navigation/native';
 import { IMAGES } from '../../constants/Images';
 import { COLORS,FONTS} from '../../constants/theme';
 import { Feather } from '@expo/vector-icons';
 import { GlobalStyleSheet } from '../../constants/StyleSheet';
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../../navigation/RootStackParamList';
+import {useChatStore} from "../../store/useChatStore";
+import {useAuthStore} from "../../store/useAuthStore";
 
 const ChatData = [
     {
@@ -119,6 +121,10 @@ type SinglechatScreenProps = StackScreenProps<RootStackParamList, 'Singlechat'>;
 
 const Singlechat = ({navigation} : SinglechatScreenProps) => {
 
+    const { activeChat } = useChatStore();
+    const {user_id} = useAuthStore()
+
+
     const theme = useTheme();
     const { colors } : {colors : any} = theme;
 
@@ -164,7 +170,7 @@ const Singlechat = ({navigation} : SinglechatScreenProps) => {
                             source={IMAGES.small6}
                         />
                         <View>
-                            <Text style={{ ...FONTS.fontRegular, fontSize: 14, color: colors.title }}>Emily Johnson</Text>
+                            <Text style={{ ...FONTS.fontRegular, fontSize: 14, color: colors.title }}>{activeChat?.other_user}</Text>
                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
                                 <View style={{ height: 10, width: 10, borderRadius: 12, backgroundColor: COLORS.primary }}></View>
                                 <Text style={{ ...FONTS.fontRegular, fontSize: 10, color:COLORS.primary }}>Online</Text>
@@ -195,7 +201,7 @@ const Singlechat = ({navigation} : SinglechatScreenProps) => {
             >
                 <View style={[GlobalStyleSheet.container,{padding:0}]}>
                     <View style={{ paddingHorizontal:15,paddingTop:20 }}>
-                        {messageList.map((data:any, index) => {
+                        {activeChat.messages.map((data:any, index) => {
                             return (
                                 <View key={index}>
                                     <View
@@ -203,8 +209,7 @@ const Singlechat = ({navigation} : SinglechatScreenProps) => {
                                             width: '75%',
                                             marginBottom: 10,
                                         },
-                                        data.send == false
-                                            ?
+                                            data.sender !== user_id ?
                                             {
                                                 marginRight: 'auto',
                                                 alignItems: 'flex-start',
@@ -218,7 +223,7 @@ const Singlechat = ({navigation} : SinglechatScreenProps) => {
                                     >
                                         <View
                                             style={[
-                                                data.send == false
+                                                data.sender !== user_id
                                                     ?
                                                     {
                                                         backgroundColor: COLORS.primary,
@@ -238,10 +243,10 @@ const Singlechat = ({navigation} : SinglechatScreenProps) => {
 
                                             ]}
                                         >
-                                            <Text style={{ ...FONTS.fontRegular, fontSize: 12, color: data.send ? COLORS.title : COLORS.white, paddingVertical: 10, paddingHorizontal: 10 }}>{data.title}</Text>
+                                            <Text style={{ ...FONTS.fontRegular, fontSize: 12, color: data.sender === user_id ? COLORS.title : COLORS.white, paddingVertical: 10, paddingHorizontal: 10 }}>{data.content}</Text>
                                         </View>
-                                        {data.time &&
-                                            <Text style={{  ...FONTS.fontMedium,fontSize:10, color: COLORS.primary, marginTop: 5 }}>{data.time}</Text>
+                                        {data.timestamp &&
+                                            <Text style={{  ...FONTS.fontMedium,fontSize:10, color: COLORS.primary, marginTop: 5 }}>{data.timestamp}</Text>
                                         }
                                     </View>
                                 </View>

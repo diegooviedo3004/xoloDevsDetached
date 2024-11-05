@@ -10,7 +10,7 @@ import { IMAGES } from '../../constants/Images'
 import Button from '../../components/Button/Button'
 import {useAuthStore} from "../../store/useAuthStore";
 import {SignInViewModel} from "./ViewModel/SignInViewModel";
-
+import { jwtDecode } from "jwt-decode";
 
 type SingInScreenProps = StackScreenProps<RootStackParamList, 'SingIn'>;
 
@@ -65,8 +65,11 @@ const SingIn = ({navigation} : SingInScreenProps) => {
         try {
             const response = await SignInViewModel(username, password);
             console.log("==> response", response);
+            const decoded = jwtDecode(response.access)
+            console.log(response.status)
             if (response.status === 200) {
-                login(response.refresh, response.access, response.user_id);
+                console.log('entré')
+                login(response.refresh, response.access, decoded.user_id);
                 setErrorMessage('');
                 console.log("==> cambiando")
                 navigation.navigate('DrawerNavigation',{screen : 'Home'} )

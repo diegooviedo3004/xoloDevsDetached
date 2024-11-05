@@ -1,5 +1,5 @@
 import { View, Text,  ScrollView, TouchableOpacity, Image } from 'react-native'
-import React from 'react'
+import React, {useEffect} from 'react'
 import { useTheme } from '@react-navigation/native';
 import Header from '../../layout/Header';
 import { IMAGES } from '../../constants/Images';
@@ -7,8 +7,8 @@ import { GlobalStyleSheet } from '../../constants/StyleSheet';
 import { COLORS,FONTS } from '../../constants/theme';
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../../navigation/RootStackParamList';
-
-
+import {socket} from "../../socket/socket";
+import {useChatStore} from "../../store/useChatStore";
 const MessagesData = [
     {
         image: IMAGES.small2,
@@ -84,6 +84,16 @@ const Chat = ({navigation} : ChatScreenProps) => {
     const theme = useTheme();
     const { colors } : {colors : any} = theme;
 
+    const { chats, startLoadingChats, startSetActiveChat } = useChatStore();
+    useEffect(() => {
+        socket.connect();
+        startLoadingChats()
+
+
+
+    }, []);
+
+
     return (
         <View style={{backgroundColor:colors.background,flex:1}}>
             <Header
@@ -96,10 +106,16 @@ const Chat = ({navigation} : ChatScreenProps) => {
             >
                 <View style={[GlobalStyleSheet.container, {paddingTop:5}]}>
 
-                    {MessagesData.map((data, index) => {
+                    {chats.map((data, index) => {
                         return (
                             <TouchableOpacity
-                                onPress={() => navigation.navigate('Singlechat')}
+                                onPress={() => {
+                                        startSetActiveChat(data.id);
+                                    setTimeout(() => {
+
+                                    navigation.navigate('Singlechat')
+                                    }, 100)
+                                }}
                                 key={index}
                                 style={[GlobalStyleSheet.flex,{
                                     padding:10,
@@ -112,17 +128,17 @@ const Chat = ({navigation} : ChatScreenProps) => {
                                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                                     <Image
                                         style={{ height: 50, width: 50, resizeMode: 'contain', borderRadius: 10 }}
-                                        source={data.image}
+                                        source={IMAGES.small2}
                                     />
                                     <View>
-                                        <Text style={{ ...FONTS.fontRegular, fontSize: 14, color: colors.title }}>{data.title}</Text>
-                                        <Text style={{ ...FONTS.fontRegular, fontSize: 12, color: colors.text }}>{data.message}</Text>
+                                        <Text style={{ ...FONTS.fontRegular, fontSize: 14, color: colors.title }}>{data.other_user}</Text>
+                                        <Text style={{ ...FONTS.fontRegular, fontSize: 12, color: colors.text }}>{data.last_message.content}</Text>
                                     </View>
                                 </View>
                                 <View>
-                                    <Text style={{ ...FONTS.fontRegular, fontSize: 11, color:colors.text }}>{data.time}</Text>
+                                    <Text style={{ ...FONTS.fontRegular, fontSize: 11, color:colors.text }}>{data.last_message.timestamp}</Text>
                                 </View>
-                                {data.hasstory ?
+                                {/*data.hasstory ?
 
                                     <View
                                         style={{
@@ -140,7 +156,7 @@ const Chat = ({navigation} : ChatScreenProps) => {
                                         <View style={{ height: 10, width: 10, borderRadius: 12, backgroundColor: COLORS.success }}></View>
                                     </View>
 
-                                    : null}
+                                    : null*/}
                             </TouchableOpacity>
                         )
                     })}
