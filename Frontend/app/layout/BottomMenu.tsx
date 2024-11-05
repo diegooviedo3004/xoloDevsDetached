@@ -168,9 +168,9 @@ const BottomMenu = ({state, navigation, descriptors}: Props) => {
                                             }}
                                             source={
                                                 label === 'Home'    ?  IMAGES.Home:
+                                                label === 'Search'     ?  IMAGES.search:
                                                 label === 'Wishlist'   ?  IMAGES.heart2:
                                                 label === 'Create'  ?  IMAGES.plus:
-                                                label === 'MyCart'     ?  IMAGES.shopping:
                                                 label === 'Profile'  ?  IMAGES.user3 : IMAGES.Home
                                             }
                                         />

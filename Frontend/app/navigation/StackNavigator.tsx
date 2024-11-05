@@ -58,6 +58,7 @@ import Toggles from '../screens/Components/Toggles';
 import { useAuthStore } from '../store/useAuthStore';
 
 import CreateNavigation from '../screens/CreatePublic/create'
+import AddBid from "../screens/Category/AddBid";
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -95,6 +96,7 @@ const StackNavigator = () => {
 						<Stack.Screen name="Search" component={Search} />
 						<Stack.Screen name="Products" component={Products} />
 						<Stack.Screen name="ProductsDetails" component={ProductsDetails} />
+						<Stack.Screen name="AddBid" component={AddBid} />
 						<Stack.Screen name="DeliveryAddress" component={DeliveryAddress} />
 						<Stack.Screen name="AddDeliveryAddress" component={AddDeliveryAddress} />
 						<Stack.Screen name="Payment" component={Payment} />

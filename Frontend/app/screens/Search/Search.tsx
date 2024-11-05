@@ -10,16 +10,16 @@ import { IMAGES } from '../../constants/Images';
 
 const SearchData = [
     {
-        title: "Hot Cappuccino Latte with Mocha",
+        title: "Toretes Gyr",
     },
     {
-        title: "Sweet Lemon Indonesian Tea",
+        title: "Toros lecheros y cárnicos",
     },
     {
-        title: "Arabica Latte Ombe Coffee",
+        title: "Torete Holstein",
     },
     {
-        title: "Original Hot Coffee",
+        title: "Pardo Suizo Europeo",
     },
 ]
 
@@ -65,7 +65,7 @@ const Search = ({navigation} : any) => {
                 </TouchableOpacity>
                 <View style={{flex:1}}>
                     <TextInput
-                        placeholder='Search Best items for You'
+                        placeholder='Buscar'
                         placeholderTextColor={COLORS.text}
                         style={[styles.searchTextinput,{
                             borderColor:colors.border,
@@ -81,12 +81,12 @@ const Search = ({navigation} : any) => {
                     <View style={{ marginTop: 10 }}>
                         {show.length > 0 && 
                             <View style={[GlobalStyleSheet.flex,{marginBottom:10}]}>
-                                <Text style={{ ...FONTS.fontMedium, fontSize: 20, color: colors.title }}>Search History</Text>
+                                <Text style={{ ...FONTS.fontMedium, fontSize: 20, color: colors.title }}>Historial</Text>
                                     <TouchableOpacity
                                         activeOpacity={0.5}
                                         onPress={() => removeItem()}
                                     >
-                                        <Text style={{ ...FONTS.fontMedium, fontSize: 12, color: colors.title }}>Clear All</Text>
+                                        <Text style={{ ...FONTS.fontMedium, fontSize: 12, color: colors.title }}>Limpiar todo</Text>
                                     </TouchableOpacity>
                             </View>
                         }
