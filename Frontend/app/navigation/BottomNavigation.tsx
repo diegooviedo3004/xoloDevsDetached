@@ -8,6 +8,7 @@ import ProfileScreen from '../screens/Profile/Profile';
 import BottomMenu from '../layout/BottomMenu';
 import { useTheme } from '@react-navigation/native';
 import CreatePublication from "../screens/CreatePublic/create";
+import Search from "../screens/Search/Search";
 
 
 const Tab = createBottomTabNavigator<BottomTabParamList>();
@@ -30,19 +31,19 @@ const BottomNavigation = () => {
                 name='Home'
                 component={HomeScreen}
             />
-            <Tab.Screen 
-                name='Wishlist'
-                component={WishlistScreen}
+            <Tab.Screen
+                name='Search'
+                component={Search}
             />
             <Tab.Screen
                 name='Create'
                 component={CreatePublication}
             />
-            <Tab.Screen 
-                name='MyCart'
-                component={MyCartScreen}
+            <Tab.Screen
+                name='Wishlist'
+                component={WishlistScreen}
             />
-            <Tab.Screen 
+            <Tab.Screen
                 name='Profile'
                 component={ProfileScreen}
             />

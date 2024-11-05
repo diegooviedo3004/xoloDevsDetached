@@ -44,6 +44,7 @@ export const IMAGES = {
     Notification: require('../assets/images/icons/Notification.png'),
     search: require('../assets/images/icons/search.png'),
     list: require('../assets/images/icons/list.png'),
+    circle: require('../assets/images/icons/circle.png'),
     list2: require('../assets/images/icons/list2.png'),
     grid: require('../assets/images/icons/grid.png'),
     arrowup: require('../assets/images/icons/arrowup.png'),

@@ -84,7 +84,7 @@ const Cardstyle4 = ({id,title,image,countnumber,price,onPress,brand,product,onPr
                         justifyContent:'center',
                         gap:10,
                         position:'absolute',
-                        top: "135px"
+                        top: "160px"
                     }}
                 >
                         <Image
