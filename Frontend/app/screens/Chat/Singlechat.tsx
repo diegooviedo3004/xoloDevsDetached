@@ -9,6 +9,7 @@ import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../../navigation/RootStackParamList';
 import {useChatStore} from "../../store/useChatStore";
 import {useAuthStore} from "../../store/useAuthStore";
+import { useSocket } from "../../socket/SocketProvider";
 
 const ChatData = [
     {
@@ -123,7 +124,7 @@ const Singlechat = ({navigation} : SinglechatScreenProps) => {
 
     const { activeChat } = useChatStore();
     const {user_id} = useAuthStore()
-
+    const socket = useSocket()
 
     const theme = useTheme();
     const { colors } : {colors : any} = theme;
@@ -133,20 +134,46 @@ const Singlechat = ({navigation} : SinglechatScreenProps) => {
     const [messageList, setMessageList] = useState(ChatData);
     const [message, setMessage] = useState("");
 
+    useEffect(() => {
+        setMessageList(activeChat.messages)
+    }, [activeChat.messages]);
+
+    useEffect(() => {
+        socket.emit("join_room", activeChat.id);
+        socket.on("room_full", (data) => {
+            console.log(data);
+        });
+        socket.on("error", (data) => {
+            console.log(data);
+        });
+
+        socket.on("new_message", (data) => {
+            setMessageList( prevMessages => [
+                ...prevMessages,
+                data
+            ])
+        })
+
+        return () => {
+            socket.emit("leave_room", activeChat.id);
+            socket.off("room_full");
+            socket.off("error")
+        }
+    }, []);
+
     const sendMessage = () => {
         if(message.length > 0){
-            setMessageList([
-                ...messageList,
-                {
-                    id: '0',
-                    title: message,
-                    time: "4.40pm",
-                    send: true,
-                },
-            ])
+
             setMessage("");
+            const data = {
+                content: message,
+                room_id: activeChat.id,
+            }
+
+            socket.emit("send_message", data);
         }
     }
+
 
     return (
        <View style={{backgroundColor:colors.background,flex:1}}>
@@ -201,7 +228,7 @@ const Singlechat = ({navigation} : SinglechatScreenProps) => {
             >
                 <View style={[GlobalStyleSheet.container,{padding:0}]}>
                     <View style={{ paddingHorizontal:15,paddingTop:20 }}>
-                        {activeChat.messages.map((data:any, index) => {
+                        {messageList.map((data:any, index) => {
                             return (
                                 <View key={index}>
                                     <View

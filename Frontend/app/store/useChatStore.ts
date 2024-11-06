@@ -13,6 +13,7 @@ interface Message {
 
 interface Chat {
     id: Number;
+    other_user_id: Number;
     other_user: string;
     last_message: Message;
 }
@@ -40,7 +41,6 @@ export const useChatStore = (): UseChatStore => {
     const startSetActiveChat = async (id: Number): Promise<void> => {
         try {
             const { data } = await api.get(`/chat/conversations/${id}/`);
-            console.log('oe');
             dispatch(setActiveChat(data));
         } catch (error) {
             console.error(error);

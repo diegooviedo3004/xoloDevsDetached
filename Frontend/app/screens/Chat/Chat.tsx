@@ -7,8 +7,9 @@ import { GlobalStyleSheet } from '../../constants/StyleSheet';
 import { COLORS,FONTS } from '../../constants/theme';
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../../navigation/RootStackParamList';
-import {socket} from "../../socket/socket";
 import {useChatStore} from "../../store/useChatStore";
+
+
 const MessagesData = [
     {
         image: IMAGES.small2,
@@ -83,14 +84,9 @@ const Chat = ({navigation} : ChatScreenProps) => {
 
     const theme = useTheme();
     const { colors } : {colors : any} = theme;
-
     const { chats, startLoadingChats, startSetActiveChat } = useChatStore();
     useEffect(() => {
-        socket.connect();
         startLoadingChats()
-
-
-
     }, []);
 
 
@@ -109,8 +105,8 @@ const Chat = ({navigation} : ChatScreenProps) => {
                     {chats.map((data, index) => {
                         return (
                             <TouchableOpacity
-                                onPress={() => {
-                                        startSetActiveChat(data.id);
+                                onPress={async () => {
+                                        await startSetActiveChat(data.other_user_id);
                                     setTimeout(() => {
 
                                     navigation.navigate('Singlechat')
