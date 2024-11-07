@@ -8,6 +8,9 @@ import { COLORS,FONTS } from '../../constants/theme';
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../../navigation/RootStackParamList';
 import {useChatStore} from "../../store/useChatStore";
+import FormmatedDate from "./FormmatedDate";
+import {useDispatch} from "react-redux";
+import {setActiveChat} from "../../redux/reducer/chatReducer";
 
 
 const MessagesData = [
@@ -84,9 +87,14 @@ const Chat = ({navigation} : ChatScreenProps) => {
 
     const theme = useTheme();
     const { colors } : {colors : any} = theme;
+    const dispatch = useDispatch();
     const { chats, startLoadingChats, startSetActiveChat } = useChatStore();
     useEffect(() => {
         startLoadingChats()
+
+        return () => {
+            dispatch(setActiveChat(null))
+        }
     }, []);
 
 
@@ -121,18 +129,18 @@ const Chat = ({navigation} : ChatScreenProps) => {
                                     borderRadius:15
                                 }]}
                             >
-                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, width: "60%" }}>
                                     <Image
                                         style={{ height: 50, width: 50, resizeMode: 'contain', borderRadius: 10 }}
                                         source={IMAGES.small2}
                                     />
                                     <View>
                                         <Text style={{ ...FONTS.fontRegular, fontSize: 14, color: colors.title }}>{data.other_user}</Text>
-                                        <Text style={{ ...FONTS.fontRegular, fontSize: 12, color: colors.text }}>{data.last_message.content}</Text>
+                                        <Text numberOfLines={1} ellipsizeMode='tail' style={{ ...FONTS.fontRegular, fontSize: 12, color: colors.text,overflow: 'hidden', width: "100%", maxWidth: "260px" }}>{data.last_message.content}</Text>
                                     </View>
                                 </View>
                                 <View>
-                                    <Text style={{ ...FONTS.fontRegular, fontSize: 11, color:colors.text }}>{data.last_message.timestamp}</Text>
+                                    <FormmatedDate style={{ ...FONTS.fontRegular, fontSize: 11, color:colors.text }} date={data.last_message.timestamp} />
                                 </View>
                                 {/*data.hasstory ?
 

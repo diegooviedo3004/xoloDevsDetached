@@ -18,9 +18,35 @@ const ArrivalData = [
     {
         id:"1",
         title: "Bovino",
-        subtitle:"41 Publicaciones",
         image:IMAGES.vacaCategories
-    }
+    },
+    {
+        id:"1",
+        title: "Guernsey",
+        image:IMAGES.vacaCategories
+    },
+    {
+        id:"1",
+        title: "Holstein",
+        image:IMAGES.vacaCategories
+    },
+
+]
+
+const profilecartData = [
+    {
+        id:"1",
+        title: "Razas \nGuernsey",
+        subtitle:"Beverages",
+        image:IMAGES.vacasCards1
+    },
+    {
+        id:"2",
+        title: "Razas Holstein \n Frisona",
+        subtitle:"Beverages",
+        image:IMAGES.vacasCards2
+    },
+
 ]
 
 const CardStyleData =[
@@ -108,7 +134,7 @@ export const Home = ({ navigation }: HomeScreenProps) => {
     return (
         <View style={{ backgroundColor: colors.card, flex: 1 }}>
             <View style={{}}>
-                <View style={[GlobalStyleSheet.container, { paddingHorizontal: 30,padding:0,paddingTop:30 }]}>
+                <View style={[GlobalStyleSheet.container, { paddingHorizontal: 30,padding:0,paddingTop:30, paddingBottom: 20 }]}>
                     <View style={[GlobalStyleSheet.flex]}>
                         <View>
                             <Text style={{ ...FONTS.fontRegular, fontSize: 14, color: colors.title }}>Buenas Noches</Text>
@@ -122,9 +148,9 @@ export const Home = ({ navigation }: HomeScreenProps) => {
                             >
                                 <Image
                                    style={[GlobalStyleSheet.image3,{tintColor:theme.dark ? COLORS.card : '#5F5F5F'}]}
-                                    source={IMAGES.Notification} 
+                                    source={IMAGES.Notification}
                                 />
-                                <View 
+                                <View
                                     style={[styles.notifactioncricle,{
                                         backgroundColor:colors.card,
                                     }]}
@@ -147,37 +173,31 @@ export const Home = ({ navigation }: HomeScreenProps) => {
                             >
                                 <Image
                                     style={[GlobalStyleSheet.image3,{tintColor:theme.dark ? COLORS.card : '#5F5F5F'}]}
-                                    source={IMAGES.grid6} 
+                                    source={IMAGES.grid6}
                                 />
                             </TouchableOpacity>
                         </View>
                     </View>
                 </View>
             </View>
+
             <ScrollView showsVerticalScrollIndicator={false}>
-                <View style={[GlobalStyleSheet.container,{padding:0,paddingHorizontal:30,paddingTop:15}]}>
-                    <View>
-                        <TextInput
-                            placeholder='Search Best items for You'
-                            style={[styles.TextInput, { color: COLORS.title,backgroundColor:'#FAFAFA' }]}
-                            placeholderTextColor={'#929292'} />
-                        <View style={{ position: 'absolute', top: 15, right: 20 }}>
-                            <Feather name='search' size={24} color={'#C9C9C9'} />
-                        </View>
+
+                <View style={{alignItems:'flex-start', marginTop: 25 }}>
+                    <View style={[GlobalStyleSheet.flex,{paddingHorizontal:30}]}>
+                        <Text style={[styles.brandsubtitle3,{fontSize: 18,color:colors.title}]}>Anuncios resaltados</Text>
                     </View>
-                </View>
-                <View style={{alignItems:'center'}}>
                     <View style={[GlobalStyleSheet.container,{padding:0,}]}>
                         <ImageSwiper
                             data={SwiperData}
+
                         />
                     </View>
                 </View>
+
                 <View style={[GlobalStyleSheet.container,{paddingHorizontal:0,paddingTop:0}]}>
-                    <View style={[GlobalStyleSheet.flex,{paddingHorizontal:30}]}>
-                        <Text style={[styles.brandsubtitle3,{fontSize: 18,color:colors.title}]}>Categories</Text>
-                    </View>
-                    <View style={{ marginHorizontal: -15, paddingHorizontal: 15, paddingTop: 25 }}>
+
+                    <View style={{ marginHorizontal: -15, paddingHorizontal: 15, }}>
                         <ScrollView
                             horizontal
                             showsHorizontalScrollIndicator={false}
@@ -188,7 +208,7 @@ export const Home = ({ navigation }: HomeScreenProps) => {
                                     return (
                                         <TouchableOpacity
                                             activeOpacity={0.8}
-                                            // onPress={() => {navigation.navigate('Products'); }}
+                                            onPress={() => {navigation.navigate('Products'); }}
                                             key={index}
                                             style={[styles.arrivaldata,{
                                                 backgroundColor:theme.dark ? colors.background :colors.card,
@@ -212,17 +232,63 @@ export const Home = ({ navigation }: HomeScreenProps) => {
                         </ScrollView>
                     </View>
                 </View>
-                <View style={[GlobalStyleSheet.container, { paddingHorizontal: 0, paddingTop: 0, paddingBottom: 10 }]}>
-                    <View style={[GlobalStyleSheet.flex, { paddingHorizontal: 30 }]}>
-                        <Text style={[styles.brandsubtitle3, { fontSize: 18, color: colors.title }]}>Featured Beverages</Text>
-                        <TouchableOpacity
-                            onPress={() => navigation.navigate('Products')}
-                        >
-                            <Text style={[styles.brandsubtitle3, { fontSize: 16, color:COLORS.primary }]}>More</Text>
-                        </TouchableOpacity>
+
+                {/* <View style={[GlobalStyleSheet.container,{padding:0}]}>
+                    <View style={[GlobalStyleSheet.flex,{paddingHorizontal:30}]}>
+                        <Text style={[styles.brandsubtitle3,{fontSize: 18,color:colors.title}]}>Mas Ordenes</Text>
                     </View>
-                </View>
-                <View style={[GlobalStyleSheet.container,{paddingHorizontal:30,flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between",  alignItems: "start" }]}>
+                    <View style={{ marginHorizontal: -15, paddingHorizontal: 15, paddingTop: 25 }}>
+                        <ScrollView
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            contentContainerStyle={{ paddingHorizontal: 30 }}
+                        >
+                            <View style={[styles.profilecard, { flexDirection: "row", gap: 10  }]}>
+                                {profilecartData.map((data: any, index) => {
+                                    return (
+                                        <TouchableOpacity
+                                            activeOpacity={0.8}
+                                            onPress={() => navigation.navigate('ProductsDetails')}
+                                            key={index}
+                                            style={[styles.arrivaldata,{
+                                                backgroundColor:COLORS.primary,
+                                                borderColor:'#EFEFEF',
+                                                width: "auto"
+                                            }]}>
+                                            <View style={[GlobalStyleSheet.flexcenter,{gap:20,justifyContent:'space-around'}]}>
+                                                <Image
+                                                    style={{height:100,width:100,resizeMode:'contain',}}
+                                                    source={data.image}
+                                                />
+                                                <View>
+                                                    <Text numberOfLines={1} style={{ ...FONTS.fontMedium, fontSize: 16, color:  COLORS.card}}>{data.title}</Text>
+                                                    <View style={{flexDirection:'row',alignItems:'center',gap:10}}>
+                                                        <Text style={{ ...FONTS.fontRegular, fontSize: 14, color:COLORS.card,opacity:.5 }}>{data.subtitle}</Text>
+                                                        <Image
+                                                            style={{height:16,width:16,resizeMode:'contain',}}
+                                                            source={IMAGES.share}
+                                                        />
+                                                    </View>
+                                                </View>
+                                            </View>
+                                        </TouchableOpacity>
+                                    );
+                                })}
+                            </View>
+                        </ScrollView>
+                    </View>
+                </View>*/}
+
+                {/*<View style={[GlobalStyleSheet.container, { paddingHorizontal: 0, paddingTop: 30, paddingBottom: 10 }]}>*/}
+                {/*    <View style={[GlobalStyleSheet.flex, { paddingHorizontal: 30 }]}>*/}
+                {/*        <TouchableOpacity*/}
+                {/*            onPress={() => navigation.navigate('Products')}*/}
+                {/*        >*/}
+                {/*            <Text style={[styles.brandsubtitle3, { fontSize: 16, color:COLORS.primary }]}>Más</Text>*/}
+                {/*        </TouchableOpacity>*/}
+                {/*    </View>*/}
+                {/*</View>*/}
+                <View style={[GlobalStyleSheet.container,{paddingHorizontal:30,flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between",  alignItems: "start", marginTop: 5 }]}>
 
                         {CardStyleData.map((data:any, index:any) => {
                             return (
@@ -241,6 +307,8 @@ export const Home = ({ navigation }: HomeScreenProps) => {
 
                 </View>
             </ScrollView>
+
+
         </View>
     );
 };

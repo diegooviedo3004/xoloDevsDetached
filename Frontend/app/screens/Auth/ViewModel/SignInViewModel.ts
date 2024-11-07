@@ -1,7 +1,7 @@
 export const SignInViewModel = async (username: string | null, password: string | null) => {
     try {
         console.log("==> datos", username, password);
-        const req = await fetch(`http://192.168.100.8:8000/auth/jwt/create/`, {
+        const req = await fetch(`http://192.168.103.55:8000/auth/jwt/create/`, {
             method: "POST",
             headers: {
                 Accept: "application/json",

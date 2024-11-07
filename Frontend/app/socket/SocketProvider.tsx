@@ -10,7 +10,7 @@ export const SocketProvider = ({ children }) => {
 
     useEffect(() => {
         if (access && !socket) {
-            const newSocket = io("http://192.168.100.8:8000", {
+            const newSocket = io("http://192.168.103.55:8000", {
                 auth: { token: access },
             });
 

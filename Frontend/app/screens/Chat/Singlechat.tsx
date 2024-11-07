@@ -10,6 +10,9 @@ import { RootStackParamList } from '../../navigation/RootStackParamList';
 import {useChatStore} from "../../store/useChatStore";
 import {useAuthStore} from "../../store/useAuthStore";
 import { useSocket } from "../../socket/SocketProvider";
+import FormattedMessageDate from "./FormmatedMessageDate";
+import messageStatus from "./MessageStatus";
+import MessageStatus from "./MessageStatus";
 
 const ChatData = [
     {
@@ -273,7 +276,10 @@ const Singlechat = ({navigation} : SinglechatScreenProps) => {
                                             <Text style={{ ...FONTS.fontRegular, fontSize: 12, color: data.sender === user_id ? COLORS.title : COLORS.white, paddingVertical: 10, paddingHorizontal: 10 }}>{data.content}</Text>
                                         </View>
                                         {data.timestamp &&
-                                            <Text style={{  ...FONTS.fontMedium,fontSize:10, color: COLORS.primary, marginTop: 5 }}>{data.timestamp}</Text>
+                                            <FormattedMessageDate style={{  ...FONTS.fontMedium,fontSize:10, color: COLORS.primary, marginTop: 5 }} date={data.timestamp} />
+                                        }
+                                        {
+                                            <MessageStatus messageList={messageList} data={data} user_id={user_id} index={index} style={{ ...FONTS.fontRegular, fontSize: 11, color: colors.text }} />
                                         }
                                     </View>
                                 </View>
@@ -292,7 +298,7 @@ const Singlechat = ({navigation} : SinglechatScreenProps) => {
                             />
                         </View>
                         <TextInput
-                            placeholder='Type Something'
+                            placeholder='Mensaje'
                             placeholderTextColor={COLORS.title}
                             onChangeText={(val) => setMessage(val)}
                             value={message}

@@ -95,7 +95,8 @@ const Cardstyle4 = ({id,title,image,countnumber,price,onPress,brand,product,onPr
                 </View>
             <View
                 style={{
-                    paddingRight:product ? 10 : 0
+                    paddingRight:product ? 10 : 0,
+                    width: "100%"
                 }}
             >
                 <View>
