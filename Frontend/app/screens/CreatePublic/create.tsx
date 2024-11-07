@@ -1,65 +1,50 @@
-import React, { useState } from 'react';
-import { StackScreenProps } from '@react-navigation/stack';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, Image, Alert, Switch, Modal } from 'react-native';
+import { Button } from "react-native-paper";
+import { useTheme } from "@react-navigation/native";
+import { ProgressStep, ProgressSteps } from "@ouedraogof/react-native-progress-steps";
+import MapLibreGL from '@maplibre/maplibre-react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image, TextInput, Switch, ScrollViewProps  } from 'react-native';
-import {RootStackParamList} from "../../navigation/RootStackParamList";
-import Header from "../../layout/Header";
-import Input from "../../components/Input/Input";
-import {Button} from "react-native-paper";
-import {useAuthStore} from "../../store/useAuthStore";
-import {useTheme} from "@react-navigation/native";
-import {ProgressStep, ProgressSteps} from "@ouedraogof/react-native-progress-steps";
 
-type CreatePublicationScreenProps = StackScreenProps<RootStackParamList, 'Create'>
+export default function CreatePublication() {
+    const theme = useTheme();
+    const { colors }: { colors: any; } = theme;
 
-const CreatePublication  = ({ navigation }: CreatePublicationScreenProps) => {
+    const MAPTILER_API_KEY = "QUXFHoHbpEpQpWh3UBP7";
 
-    const {
-        access
-    } = useAuthStore();
-    // Estado para los datos del formulario
     const [formData, setFormData] = useState({
-        title: '',
-        description: '',
-        age: '',
-        weight: '',
-        price: '',
-        active: false,
-        vaccinated: false,
-        for_sale: false,
-        birth_date: '',
-        last_parturition_date: '',
-        expected_parturition_date: '',
-        last_heat_date: '',
-        pregnancy_date: '',
-        days_of_pregnancy: '',
-        milk_production: '',
-        days_of_lactation: '',
-        brucellosis_application: false,
-        mother: '',
-        father: '',
-        comments: '',
-        breeds: '',
-        traits: ''
+        titulo: '',
+        descripcion: '',
+        precio: '',
+        sexo: '',
+        raza: '',
+        trazabilidad: false,
+        video_url: '',
+        usar_ubicacion_usuario: false,
     });
 
-    React.useEffect(() => {
-        (async () => {
-            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-            if (status !== 'granted') {
-                alert('Lo sentimos, necesitamos permisos de acceso a tu galería.');
-            }
-        })();
-    }, []);
+    const [userCoordinates, setUserCoordinates] = useState<[number, number] | null>(null);
+    const [images, setImages] = useState<string[]>([]);
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-    const [images, setImages] = useState<string[]>([]); // Guardar varias imágenes
+    useEffect(() => {
+        // Solicitar y obtener coordenadas del usuario si está habilitado
+        if (formData.usar_ubicacion_usuario) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    setUserCoordinates([longitude, latitude]);
+                },
+                (error) => console.error("Error obteniendo ubicación", error),
+                { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+            );
+        }
+    }, [formData.usar_ubicacion_usuario]);
 
-    // Manejo de cambios en los inputs
-    const handleInputChange = (name, value) => {
+    const handleInputChange = (name: string, value: string | boolean) => {
         setFormData({ ...formData, [name]: value });
     };
 
-    // Selección de imágenes sin `allowsEditing`
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -69,223 +54,260 @@ const CreatePublication  = ({ navigation }: CreatePublicationScreenProps) => {
 
         if (!result.canceled) {
             const selectedImages = result.assets.map(asset => asset.uri);
-            setImages([...images, ...selectedImages]); // Agregar nuevas imágenes al estado
-        }
-    };
+            const totalImages = [...images, ...selectedImages].slice(0, 9);
+            setImages(totalImages);
 
-    const handleSwitchChange = (name, value) => {
-        setFormData({ ...formData, [name]: value });
-    };
-
-    // Enviar los datos usando fetch
-    const submitForm = async () => {
-        const token = access; // Reemplaza esto con tu token JWT
-        const url = 'http://192.168.1.12:8000/create-cow/'; // URL de tu API
-        console.log("==> access", access);
-        try {
-            var data = new FormData();
-
-            // Añadir los datos del formulario a FormData
-            data.append('title', formData.title);
-            data.append('description', formData.description);
-            data.append('age', formData.age);
-            data.append('weight', formData.weight);
-            data.append('price', formData.price);
-            data.append('active', formData.active.toString()); // Booleanos como cadenas
-            data.append('vaccinated', formData.vaccinated.toString());
-            data.append('for_sale', formData.for_sale.toString());
-            data.append('birth_date', formData.birth_date);
-            data.append('last_parturition_date', formData.last_parturition_date);
-            data.append('expected_parturition_date', formData.expected_parturition_date);
-            data.append('last_heat_date', formData.last_heat_date);
-            data.append('pregnancy_date', formData.pregnancy_date);
-            data.append('days_of_pregnancy', formData.days_of_pregnancy);
-            data.append('milk_production', formData.milk_production);
-            data.append('days_of_lactation', formData.days_of_lactation);
-            data.append('brucellosis_application', formData.brucellosis_application.toString());
-            data.append('mother', formData.mother);
-            data.append('father', formData.father);
-            data.append('comments', formData.comments);
-
-            // Añadir las imágenes a FormData
-            images.forEach((imageUri, index) => {
-                const imageName = `image_${index}`;
-                const fileType = imageUri.split('.').pop();
-                data.append('images', {
-                    uri: imageUri,
-                    name: `${imageName}.${fileType}`,
-                    type: `image/${fileType}`,
-                });
-            });
-
-            const req = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'multipart/form-data'
-                },
-                body: data,
-            });
-
-            const response = await req.json();
-
-            if (req.ok) {
-                console.log('Respuesta del servidor:', response);
-            } else {
-                console.error('Error al crear la vaca:', response);
+            if (totalImages.length > 9) {
+                Alert.alert("Límite de imágenes", "Puedes seleccionar un máximo de 9 imágenes.");
             }
-        } catch (e) {
-            console.error('Error en el envío del formulario:', e);
         }
     };
 
-    // <Text style={styles.headerText}>Crear Publicación</Text>
-    //
-    // {/* Sección de Imágenes */}
-    // <View style={styles.imageSection}>
-    //     <Text style={styles.subHeaderText}>Imagen de publicación</Text>
-    //     <View style={styles.imageUpload}>
-    //         <Button onPress={pickImage} >Seleccionar imágenes</Button>
-    //     </View>
-    //     <ScrollView horizontal>
-    //         {images.map((imageUri, index) => (
-    //             <Image key={index} source={{ uri: imageUri }} style={styles.selectedImage} />
-    //         ))}
-    //     </ScrollView>
-    // </View>
-    //
-
-    const theme = useTheme();
-    const { colors }: { colors: any; } = theme;
-
-    const defaultScrollViewProps: ScrollViewProps = {
-        keyboardShouldPersistTaps: 'handled',
-        contentContainerStyle: {
-            flex: 1,
-            justifyContent: 'center',
-        },
-    };
-    const onNextStep = () => {
-        console.log('called next step');
+    const removeImage = (index: number) => {
+        const newImages = [...images];
+        newImages.splice(index, 1);
+        setImages(newImages);
     };
 
-    const onPaymentStepComplete = () => {
-        alert('Payment step completed!');
+    const showImage = (uri: string) => {
+        setSelectedImage(uri);
     };
 
-    const onPrevStep = () => {
-        console.log('called previous step');
+    const closeImage = () => {
+        setSelectedImage(null);
     };
 
-    const onSubmitSteps = () => {
-        console.log('called on submit step.');
+    const submitForm = () => {
+        Alert.alert("Publicación creada", "Tu publicación ha sido creada exitosamente.");
     };
 
+    const centerCoordinates = formData.usar_ubicacion_usuario && userCoordinates
+        ? userCoordinates
+        : [-122.4194, 37.7749]; // Coordenadas por defecto
 
     return (
-      <View style={{backgroundColor: colors.card, flex: 1 }}>
-          <Header
-              title='Crear Publicacion'
-              leftIcon={'back'}
-              rightIcon2={'home'}
-          />
-          <View style={{ flex: 1, marginTop: 50 }}>
-              <ProgressSteps>
-                  <ProgressStep
-                      label="Payment"
-                      onNext={onPaymentStepComplete}
-                      onPrevious={onPrevStep}
-                      scrollViewProps={defaultScrollViewProps}
-                  >
-                      <View style={{ alignItems: 'center' }}>
-                          <Text>Payment step content</Text>
-                      </View>
-                  </ProgressStep>
-                  <ProgressStep
-                      label="Shipping Address"
-                      onNext={onNextStep}
-                      onPrevious={onPrevStep}
-                      scrollViewProps={defaultScrollViewProps}
-                  >
-                      <View style={{ alignItems: 'center' }}>
-                          <Text>Shipping address step content</Text>
-                      </View>
-                  </ProgressStep>
-                  <ProgressStep
-                      label="Billing Address"
-                      onNext={onNextStep}
-                      onPrevious={onPrevStep}
-                      scrollViewProps={defaultScrollViewProps}
-                  >
-                      <View style={{ alignItems: 'center' }}>
-                          <Text>Billing address step content</Text>
-                      </View>
-                  </ProgressStep>
-                  <ProgressStep
-                      label="Confirm Order"
-                      onPrevious={onPrevStep}
-                      onSubmit={onSubmitSteps}
-                      scrollViewProps={defaultScrollViewProps}
-                  >
-                      <View style={{ alignItems: 'center' }}>
-                          <Text>Confirm order step content</Text>
-                      </View>
-                  </ProgressStep>
-              </ProgressSteps>
-          </View>
-      </View>
+        <View style={{ backgroundColor: colors.card, flex: 1 }}>
+            <View style={{ flex: 1, marginTop: 50 }}>
+                <ProgressSteps>
+                    {/* Paso 1: Detalles Generales */}
+                    <ProgressStep label="Detalles Generales">
+                        <View style={{ padding: 16 }}>
+                            <Text>Título</Text>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Título"
+                                value={formData.titulo}
+                                onChangeText={(text) => handleInputChange('titulo', text)}
+                            />
+                            <Text>Descripción</Text>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Descripción"
+                                value={formData.descripcion}
+                                onChangeText={(text) => handleInputChange('descripcion', text)}
+                            />
+                            <Text>Precio</Text>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Precio"
+                                value={formData.precio}
+                                onChangeText={(text) => handleInputChange('precio', text)}
+                            />
+
+                            {/* Selector de Sexo */}
+                            <Text>Sexo</Text>
+                            <View style={styles.optionContainer}>
+                                {['Hembra', 'Macho'].map(option => (
+                                    <TouchableOpacity
+                                        key={option}
+                                        style={[
+                                            styles.optionButton,
+                                            formData.sexo === option && styles.optionButtonSelected
+                                        ]}
+                                        onPress={() => handleInputChange('sexo', option)}
+                                    >
+                                        <Text style={formData.sexo === option ? styles.optionTextSelected : styles.optionText}>
+                                            {option}
+                                        </Text>
+                                    </TouchableOpacity>
+                                ))}
+                            </View>
+
+                            {/* Campo de texto para Raza */}
+                            <Text>Raza</Text>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Raza"
+                                value={formData.raza}
+                                onChangeText={(text) => handleInputChange('raza', text)}
+                            />
+                        </View>
+                    </ProgressStep>
+
+                    {/* Paso 2: Configuración Adicional */}
+                    <ProgressStep label="Configuración Adicional">
+                        <View style={{ padding: 16 }}>
+                            <Text>Configurar Trazabilidad</Text>
+                            <Switch
+                                value={formData.trazabilidad}
+                                onValueChange={(value) => handleInputChange('trazabilidad', value)}
+                            />
+                            <Text>URL del Video</Text>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Enlace del video"
+                                value={formData.video_url}
+                                onChangeText={(text) => handleInputChange('video_url', text)}
+                            />
+
+                            {/* Imágenes */}
+                            <Text style={{ marginTop: 20 }}>Imágenes</Text>
+                            <Button onPress={pickImage}>Seleccionar imágenes</Button>
+                            <ScrollView horizontal style={{ marginTop: 10 }}>
+                                {images.map((imageUri, index) => (
+                                    <TouchableOpacity key={index} onPress={() => showImage(imageUri)}>
+                                        <Image source={{ uri: imageUri }} style={styles.selectedImage} />
+                                        <TouchableOpacity
+                                            style={styles.deleteButton}
+                                            onPress={() => removeImage(index)}
+                                        >
+                                            <Text style={{ color: 'white', fontWeight: 'bold' }}>X</Text>
+                                        </TouchableOpacity>
+                                    </TouchableOpacity>
+                                ))}
+                            </ScrollView>
+                            {images.length === 0 && <Text style={styles.errorText}>Se requiere al menos una imagen</Text>}
+                        </View>
+                    </ProgressStep>
+
+                    {/* Paso 3: Mapa */}
+                    <ProgressStep label="Mapa">
+                        <View style={{ padding: 16 }}>
+                            <Text>Usar Coordenadas del Usuario</Text>
+                            <Switch
+                                value={formData.usar_ubicacion_usuario}
+                                onValueChange={(value) => handleInputChange('usar_ubicacion_usuario', value)}
+                            />
+                            <View style={styles.mapPlaceholder}>
+                                {/*<MapLibreGL.MapView*/}
+                                {/*    style={styles.map}*/}
+                                {/*    styleURL={`https://api.maptiler.com/maps/streets-v2/style.json?key=${MAPTILER_API_KEY}`}*/}
+                                {/*    logoEnabled={false}*/}
+                                {/*    attributionPosition={{ bottom: 8, right: 8 }}*/}
+                                {/*>*/}
+                                {/*    <MapLibreGL.Camera*/}
+                                {/*        defaultSettings={{ centerCoordinate: centerCoordinates, zoomLevel: 8 }}*/}
+                                {/*    />*/}
+                                {/*</MapLibreGL.MapView>*/}
+                            </View>
+                        </View>
+                    </ProgressStep>
+
+                    {/* Paso 4: Confirmación y Envío */}
+                    <ProgressStep label="Confirmación" onSubmit={submitForm}>
+                        <View style={{ alignItems: 'center', padding: 16 }}>
+                            <Text>Revisa tus datos y envía la publicación</Text>
+                        </View>
+                    </ProgressStep>
+                </ProgressSteps>
+            </View>
+
+            {/* Modal para ver imagen en pantalla completa */}
+            <Modal visible={!!selectedImage} transparent={true}>
+                <View style={styles.modalContainer}>
+                    <TouchableOpacity style={styles.modalCloseButton} onPress={closeImage}>
+                        <Text style={styles.modalCloseText}>Cerrar</Text>
+                    </TouchableOpacity>
+                    {selectedImage && (
+                        <Image source={{ uri: selectedImage }} style={styles.fullScreenImage} />
+                    )}
+                </View>
+            </Modal>
+        </View>
     );
-};
+}
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: 'white',
-        padding: 16,
-    },
-    headerText: {
-        fontSize: 20,
-        fontWeight: '600',
-        marginTop: 20,
-    },
-    imageSection: {
-        marginTop: 20,
-    },
-    subHeaderText: {
-        fontSize: 16,
-        color: '#62676C',
-    },
-    imageUpload: {
-        marginTop: 10,
-        padding: 20,
+    input: {
         borderWidth: 1,
-        borderStyle: 'dotted',
-        borderColor: '#9C9CA3',
+        borderColor: '#ccc',
+        padding: 8,
+        marginVertical: 8,
+        borderRadius: 4,
+    },
+    optionContainer: {
+        flexDirection: 'row',
+        marginVertical: 10,
+    },
+    optionButton: {
+        flex: 1,
+        padding: 10,
         alignItems: 'center',
+        borderRadius: 4,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        marginRight: 5,
+    },
+    optionButtonSelected: {
+        backgroundColor: '#007aff',
+        borderColor: '#007aff',
+    },
+    optionText: {
+        color: '#333',
+    },
+    optionTextSelected: {
+        color: '#fff',
+    },
+    errorText: {
+        color: 'red',
+        fontSize: 12,
     },
     selectedImage: {
         width: 100,
         height: 100,
         marginRight: 10,
+        borderRadius: 8,
     },
-    switchContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+    deleteButton: {
+        position: 'absolute',
+        top: 5,
+        right: 5,
+        backgroundColor: 'red',
+        borderRadius: 12,
+        padding: 4,
+    },
+    mapPlaceholder: {
+        height: 400,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 8,
+        overflow: 'hidden',
+        marginVertical: 15,
+    },
+    map: {
+        flex: 1,
+    },
+    modalContainer: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        justifyContent: 'center',
         alignItems: 'center',
-        marginVertical: 10,
     },
-    submitButton: {
-        backgroundColor: '#28a745',
-        padding: 15,
+    modalCloseButton: {
+        position: 'absolute',
+        top: 40,
+        right: 20,
+        backgroundColor: 'red',
+        padding: 10,
         borderRadius: 5,
-        alignItems: 'center',
-        marginTop: 20,
-        marginBottom: 20
     },
-    submitButtonText: {
-        color: '#fff',
+    modalCloseText: {
+        color: 'white',
         fontSize: 16,
     },
+    fullScreenImage: {
+        width: '90%',
+        height: '70%',
+        resizeMode: 'contain',
+    },
 });
-
-export default CreatePublication;
