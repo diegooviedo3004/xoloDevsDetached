@@ -126,13 +126,19 @@ const ProductsDetails = ({navigation} : ProductsDetailsScreenProps) => {
                     </View>
                 </View>
             </ScrollView>
-            <View style={[GlobalStyleSheet.container,{paddingTop:0}]}>
+            <View style={[GlobalStyleSheet.container,{paddingTop:0,}]}>
                 <Button
-                    onPress={() => navigation.navigate('DeliveryAddress')}
-                    title='Place order'
+                    onPress={() => navigation.navigate('Singlechat')}
+                    title='Contactar'
                     color={COLORS.primary}
                     text={COLORS.card}
                     style={{borderRadius:50}}
+                />
+                <Button
+                    onPress={() => navigation.navigate('AddBid')}
+                    title='Hacer una oferta'
+                    text={COLORS.primary}
+                    style={{ marginTop: 5 , borderRadius:50, backgroundColor:COLORS.card, borderStyle: "solid",  borderWidth: 1, borderColor:COLORS.primary}}
                 />
             </View>
        </View>

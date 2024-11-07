@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Post</title>
+</head>
+<body>
+  <h1>Create a New Post</h1>
+  
+  <form id="postForm" action="http://localhost:8000/posts/" method="post" enctype="multipart/form-data">
+    <!-- CSRF token for Django if needed -->
+    <!-- <input type="hidden" name="csrfmiddlewaretoken" value="your-csrf-token"> -->
+    
+    <label for="descripcion">Description:</label>
+    <textarea id="descripcion" name="descripcion" required></textarea><br><br>
+
+    <label for="sexo">Sex:</label>
+    <select id="sexo" name="sexo" required>
+      <option value="M">Macho</option>
+      <option value="H">Hembra</option>
+    </select><br><br>
+
+    <label for="raza">Breed:</label>
+    <input type="text" id="raza" name="raza" required><br><br>
+
+    <label for="ubicacion">Location:</label>
+    <input type="text" id="ubicacion" name="ubicacion" required><br><br>
+
+    <label for="precio">Price:</label>
+    <input type="number" id="precio" name="precio" step="0.01" required><br><br>
+
+    <label for="kg">Weight (kg):</label>
+    <input type="number" id="kg" name="kg" step="0.01"><br><br>
+
+    <label for="trazabilidad">Traceability:</label>
+    <input type="text" id="trazabilidad" name="trazabilidad"><br><br>
+
+    <label for="video_url">Video URL:</label>
+    <input type="url" id="video_url" name="video_url"><br><br>
+
+    <label for="draft">Draft:</label>
+    <input type="checkbox" id="draft" name="draft" checked><br><br>
+
+    <label for="images">Images:</label>
+    <input type="file" id="images" name="images" multiple><br><br>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+    document.getElementById('postForm').onsubmit = async function(event) {
+      event.preventDefault();
+      
+      const form = document.getElementById('postForm');
+      const formData = new FormData(form);
+      
+      try {
+        const response = await fetch(form.action, {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMwODcyNzExLCJpYXQiOjE3MzA4NzI0MTEsImp0aSI6IjgyNDNiN2YyNDgyYTQyMDliNGI4ZmJlNmFlZmY4MTIxIiwidXNlcl9pZCI6M30.9LoGp26190_zMWAIvUDVlJNBZthDjY19CuIorPOtO3k'
+          },
+          body: formData,
+        });
+
+        if (response.ok) {
+          alert('Post created successfully!');
+          form.reset();
+        } else {
+          const errorData = await response.json();
+          console.error('Error:', errorData);
+          alert('Error creating post. Check console for details.');
+        }
+      } catch (error) {
+        console.error('Fetch error:', error);
+        alert('Error connecting to server.');
+      }
+    };
+  </script>
+</body>
+</html>

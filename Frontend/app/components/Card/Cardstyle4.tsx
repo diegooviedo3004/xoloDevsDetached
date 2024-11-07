@@ -52,27 +52,27 @@ const Cardstyle4 = ({id,title,image,countnumber,price,onPress,brand,product,onPr
     return (
         <TouchableOpacity
             activeOpacity={0.8}
-            onPress={onPress} 
-            style={{flexDirection:'row',width:'100%',alignItems:'flex-start'}}
+            onPress={onPress}
+            style={{flexDirection:'column',alignItems:'flex-start', width: "45%", marginBottom: "50px"}}
         >
-            <View style={{width:'40%',alignItems:'center'}}>
-                <View 
-                    style={{
+            <View
+                style={{
                         height:undefined,
-                        width:'100%',
                         backgroundColor:COLORS.primary,
                         borderRadius:22,
                         aspectRatio:1/1.2,
                         alignItems:'center',
                         justifyContent:'center',
-                        overflow:'hidden'
-                    }}
-                >
+                        overflow:'hidden',
+                        width: "100%",
+                        marginBottom: "10px"
+                }}
+            >
                     <Image
                         style={{height:undefined,width:'100%',aspectRatio:1/1.2,}}
                         source={image}
                     />
-                </View>
+            </View>
                 <View
                     style={{
                         borderRadius:19,
@@ -84,7 +84,7 @@ const Cardstyle4 = ({id,title,image,countnumber,price,onPress,brand,product,onPr
                         justifyContent:'center',
                         gap:10,
                         position:'absolute',
-                        bottom:-15
+                        top: "160px"
                     }}
                 >
                         <Image
@@ -93,24 +93,22 @@ const Cardstyle4 = ({id,title,image,countnumber,price,onPress,brand,product,onPr
                         />
                         <Text style={[styles.brandsubtitle3,{fontSize:16,color:COLORS.card,lineHeight:34}]}>3.8</Text>
                 </View>
-            </View>
-            <View 
+            <View
                 style={{
-                    width:'60%',
-                    paddingHorizontal:20,
-                    paddingRight:product ? 10 : 0
+                    paddingRight:product ? 10 : 0,
+                    width: "100%"
                 }}
             >
                 <View>
                     <Text style={{...FONTS.fontMedium,fontSize:16,color:colors.title,paddingRight:40}}>{title}</Text>
                     <Text style={{...FONTS.fontRegular,fontSize:12,color:theme.dark ? 'rgba(255,255,255,.7)':'#6A6A6A',marginTop:5}}>{brand}</Text>
                 </View>
-                <View style={[GlobalStyleSheet.flex,{marginTop:Myorder ? 45:30}]}>
+                <View style={[GlobalStyleSheet.flex,{marginTop:0}]}>
                     <Text style={{...FONTS.fontSemiBold,fontSize:18,color:colors.title}}>{price}</Text>
-                    {product ? 
+                    {/* {product ?
                         <TouchableOpacity
                             activeOpacity={0.9}
-                            onPress={() => {setshow(!show) ; onPress2() }} 
+                            onPress={() => {setshow(!show) ; onPress2() }}
                             style={{
                                 padding:10,
                                 paddingHorizontal:25,
@@ -128,47 +126,47 @@ const Cardstyle4 = ({id,title,image,countnumber,price,onPress,brand,product,onPr
                             />
                             <Text style={{...FONTS.fontMedium,fontSize:16,color:show ? COLORS.card : COLORS.primary}}>Buy</Text>
                         </TouchableOpacity>
-                    :Myorder ?completed ? 
-                        <TouchableOpacity
-                            activeOpacity={0.8}
-                            onPress={onPress4}
-                            style={{
-                                padding:10,
-                                paddingHorizontal:15,
-                                backgroundColor:COLORS.primary,
-                                borderRadius:30,
-                                flexDirection:'row',
-                                alignItems:'center',
-                                justifyContent:'center',
-                                gap:10
-                            }}
-                        >
-                            <Text style={{...FONTS.fontMedium,fontSize:14,color:COLORS.card,lineHeight:21}}>{btntitle}</Text>
-                        </TouchableOpacity>
-                    : 
-                        <TouchableOpacity
-                            activeOpacity={0.8}
-                            onPress={onPress3}
-                            style={{
-                                padding:10,
-                                paddingHorizontal:20,
-                                backgroundColor:COLORS.primary,
-                                borderRadius:30,
-                                flexDirection:'row',
-                                alignItems:'center',
-                                justifyContent:'center',
-                                gap:10
-                            }}
-                        >
-                            <Text style={{...FONTS.fontMedium,fontSize:14,color:COLORS.card,lineHeight:21}}>{btntitle}</Text>
-                        </TouchableOpacity>
-                        :
-                        <Text style={{...FONTS.fontMedium,fontSize:18,color:COLORS.primary}}>{countnumber}</Text>
-                    }
+                        :Myorder ?completed ?
+                                <TouchableOpacity
+                                    activeOpacity={0.8}
+                                    onPress={onPress4}
+                                    style={{
+                                        padding:10,
+                                        paddingHorizontal:15,
+                                        backgroundColor:COLORS.primary,
+                                        borderRadius:30,
+                                        flexDirection:'row',
+                                        alignItems:'center',
+                                        justifyContent:'center',
+                                        gap:10
+                                    }}
+                                >
+                                    <Text style={{...FONTS.fontMedium,fontSize:14,color:COLORS.card,lineHeight:21}}>{btntitle}</Text>
+                                </TouchableOpacity>
+                                :
+                                <TouchableOpacity
+                                    activeOpacity={0.8}
+                                    onPress={onPress3}
+                                    style={{
+                                        padding:10,
+                                        paddingHorizontal:20,
+                                        backgroundColor:COLORS.primary,
+                                        borderRadius:30,
+                                        flexDirection:'row',
+                                        alignItems:'center',
+                                        justifyContent:'center',
+                                        gap:10
+                                    }}
+                                >
+                                    <Text style={{...FONTS.fontMedium,fontSize:14,color:COLORS.card,lineHeight:21}}>{btntitle}</Text>
+                                </TouchableOpacity>
+                            :
+                            <Text style={{...FONTS.fontMedium,fontSize:18,color:COLORS.primary}}>{countnumber}</Text>
+                    }*/}
                 </View>
                 {Myorder ?
                     null
-                :
+                    :
                     <View
                         style={{
                             position:'absolute',

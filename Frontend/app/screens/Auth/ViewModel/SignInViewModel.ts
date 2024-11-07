@@ -1,7 +1,7 @@
 export const SignInViewModel = async (username: string | null, password: string | null) => {
     try {
         console.log("==> datos", username, password);
-        const req = await fetch(`http://192.168.1.12:8000/login/`, {
+        const req = await fetch(`http://192.168.103.55:8000/auth/jwt/create/`, {
             method: "POST",
             headers: {
                 Accept: "application/json",
@@ -20,7 +20,7 @@ export const SignInViewModel = async (username: string | null, password: string 
         }
 
         const resp = await req.json();
-        return resp;
+        return { status: req.status, ...resp };
 
     } catch (e) {
         console.error('Error durante la autenticación:', e);
