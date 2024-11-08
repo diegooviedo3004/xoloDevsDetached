@@ -215,14 +215,13 @@ export const Home = ({ navigation }: HomeScreenProps) => {
                                                 borderColor:'#EFEFEF',
                                                 shadowColor: "rgba(4,118,78,.6)",
                                             }]}>
-                                            <View style={[GlobalStyleSheet.flexcenter,{gap:20,justifyContent:'flex-start'}]}>
+                                            <View style={[GlobalStyleSheet.flexcenter,{gap:20,justifyContent:'flex-start', padding: 3}]}>
                                                 <Image
                                                     style={[GlobalStyleSheet.image3]}
                                                     source={data.image}
                                                 />
                                                 <View>
                                                     <Text style={{ ...FONTS.fontMedium, fontSize: 16, color:  colors.title }}>{data.title}</Text>
-                                                    <Text style={{ ...FONTS.fontRegular, fontSize: 14, color:COLORS.primary }}>{data.subtitle}</Text>
                                                 </View>
                                             </View>
                                         </TouchableOpacity>

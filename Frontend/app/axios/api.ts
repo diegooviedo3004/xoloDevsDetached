@@ -1,8 +1,10 @@
 import axios from 'axios';
 import { useAuthStore } from '../store/useAuthStore';
 
+const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+
 const api = axios.create({
-    baseURL: 'http://192.168.103.55:8000',
+    baseURL: apiUrl,
 });
 
 const setupInterceptors = () => {

@@ -3,6 +3,7 @@ import { io } from "socket.io-client";
 import { useAuthStore } from "../store/useAuthStore";
 
 const SocketContext = createContext(null);
+const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
 export const SocketProvider = ({ children }) => {
     const { access } = useAuthStore();
@@ -10,7 +11,7 @@ export const SocketProvider = ({ children }) => {
 
     useEffect(() => {
         if (access && !socket) {
-            const newSocket = io("http://192.168.103.55:8000", {
+            const newSocket = io(apiUrl, {
                 auth: { token: access },
             });
 

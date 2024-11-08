@@ -10,7 +10,9 @@ import { IMAGES } from '../../constants/Images'
 import Button from '../../components/Button/Button'
 import {useAuthStore} from "../../store/useAuthStore";
 import {SignInViewModel} from "./ViewModel/SignInViewModel";
+import "core-js/stable/atob";
 import { jwtDecode } from "jwt-decode";
+
 
 type SingInScreenProps = StackScreenProps<RootStackParamList, 'SingIn'>;
 
