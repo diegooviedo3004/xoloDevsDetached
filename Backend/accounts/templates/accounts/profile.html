@@ -1,10 +1,50 @@
 {% extends 'base.html' %}
-{% block title %}Perfil{% endblock %}
+{% load widget_tweaks %}
+
+
 {% block content %}
-  <h2>Mi Perfil</h2>
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Guardar Cambios</button>
-  </form>
+<section class="account py-80">
+  <div class="container container-lg">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      
+      <div class="row gy-4 justify-content-center">
+        <div class="col-xl-6 pe-xl-5 my-5">  
+          <div class="border border-gray-100 hover-border-main-600 transition-1 rounded-16 px-24 py-40">
+            <h6 class="text-xl mb-32">Mi perfil</h6>
+            
+            <!-- Nombre -->
+            <div class="mb-24">
+              <label for="id_first_name" class="text-neutral-900 text-lg mb-8 fw-medium">Nombre</label>
+              {% render_field form.first_name class="common-input" placeholder="Ingresa tu nombre" %}
+            </div>
+            
+            <!-- Apellido -->
+            <div class="mb-24">
+              <label for="id_last_name" class="text-neutral-900 text-lg mb-8 fw-medium">Apellido</label>
+              {% render_field form.last_name class="common-input" placeholder="Ingresa tu apellido" %}
+            </div>
+
+            <!-- Correo Electrónico -->
+            <div class="mb-24">
+              <label for="id_email" class="text-neutral-900 text-lg mb-8 fw-medium">Correo Electrónico</label>
+              {% render_field form.email class="common-input" placeholder="Ingresa tu correo electrónico" %}
+            </div>
+            
+            <!-- Foto de Perfil -->
+            <div class="mb-24">
+              <label for="id_avatar" class="text-neutral-900 text-lg mb-8 fw-medium">Foto de Perfil</label>
+              {% render_field form.avatar class="common-input" %}
+            </div>
+
+            <!-- Botón de Guardar -->
+            <div class="mt-48">
+              <button type="submit" class="btn btn-main py-18 px-40">Guardar Cambios</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
 {% endblock %}

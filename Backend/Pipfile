@@ -33,6 +33,7 @@ python-socketio = {extras = ["asyncio"], version = "*"}
 daphne = "*"
 django-cors-headers = "*"
 channels = "*"
+django-widget-tweaks = "*"
 
 [dev-packages]
 

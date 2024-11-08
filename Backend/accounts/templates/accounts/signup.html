@@ -1,10 +1,75 @@
 {% extends 'base.html' %}
-{% block title %}Registrarse{% endblock %}
+{% load static %}
+{% load widget_tweaks %}
+
 {% block content %}
-  <h2>Registrarse</h2>
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Registrar</button>
-  </form>
+<section class="account py-80">
+  <div class="container container-lg">
+    <form method="post" action="{% url 'signup' %}">
+      {% csrf_token %}
+      <div class="row gy-4 justify-content-center">
+        <div class="col-xl-6 pe-xl-5 my-5">
+          <div class="border border-gray-100 hover-border-main-600 transition-1 rounded-16 px-24 py-40">
+            <h6 class="text-xl mb-32">Regístrate</h6>
+              
+            <!-- Nombre -->
+            <div class="mb-24">
+              <label for="id_first_name" class="text-neutral-900 text-lg mb-8 fw-medium">Nombre <span class="text-danger">*</span></label>
+              {% render_field form.first_name class="common-input" id="id_first_name" placeholder="Ingresa tu nombre" autofocus="true" %}
+            </div>
+
+            <!-- Apellido -->
+            <div class="mb-24">
+              <label for="id_last_name" class="text-neutral-900 text-lg mb-8 fw-medium">Apellido <span class="text-danger">*</span></label>
+              {% render_field form.last_name class="common-input" id="id_last_name" placeholder="Ingresa tu apellido" %}
+            </div>
+
+            <!-- Correo Electrónico -->
+            <div class="mb-24">
+              <label for="id_email" class="text-neutral-900 text-lg mb-8 fw-medium">Correo electrónico <span class="text-danger">*</span></label>
+              {% render_field form.email class="common-input" id="id_email" placeholder="Ingresa tu correo electrónico" %}
+            </div>
+
+            <!-- Contraseña -->
+            <div class="mb-24">
+              <label for="id_password1" class="text-neutral-900 text-lg mb-8 fw-medium">Contraseña <span class="text-danger">*</span></label>
+              <div class="position-relative">
+                {% render_field form.password1 class="common-input" id="id_password1" placeholder="Ingresa tu contraseña" %}
+                <span class="toggle-password position-absolute top-50 inset-inline-end-0 me-16 translate-middle-y cursor-pointer ph ph-eye-slash" id="#id_password1"></span>
+              </div>
+            </div>
+
+            <!-- Confirmación de Contraseña -->
+            <div class="mb-24">
+              <label for="id_password2" class="text-neutral-900 text-lg mb-8 fw-medium">Confirma tu contraseña <span class="text-danger">*</span></label>
+              <div class="position-relative">
+                {% render_field form.password2 class="common-input" id="id_password2" placeholder="Confirma tu contraseña" %}
+                <span class="toggle-password position-absolute top-50 inset-inline-end-0 me-16 translate-middle-y cursor-pointer ph ph-eye-slash" id="#id_password2"></span>
+              </div>
+            </div>
+
+            <!-- Política de privacidad -->
+            <div class="my-48">
+              <p class="text-gray-500">Tus datos personales se usarán para procesar tu registro, y para otros propósitos descritos en nuestra 
+                <a href="#" class="text-main-600 text-decoration-underline">política de privacidad</a>.
+              </p>
+            </div>
+
+            <!-- Botón de Registro -->
+            <div class="mt-48">
+              <button type="submit" class="btn btn-main py-18 px-40">Regístrate</button>
+            </div>
+
+            <!-- Enlace para Iniciar Sesión -->
+            <div class="mt-24">
+              <span class="text-sm fw-semibold">¿Ya tienes una cuenta?</span>
+              <a href="{% url 'login' %}" class="text-success-600 text-sm fw-bold hover-text-decoration-underline">Inicia sesión</a>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
 {% endblock %}

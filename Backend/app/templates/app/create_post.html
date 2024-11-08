@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+    
+<main class="d-flex align-items-center" style="margin-top: 2rem; margin-bottom: 10rem;">
+    <div class="container">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div id="wizard">
+
+              <!-- Paso 1: Información Básica del Animal -->
+              <h3>Información Básica del Animal</h3>
+              <section>
+                  <h5 class="bd-wizard-step-title">Paso 1</h5>
+                  <h2 class="section-heading">Información Básica del Animal</h2>
+                  <div class="container">
+                    <div style="display: flex; gap: 10px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label for="sexo">Sexo</label>
+                            {% render_field form.sexo class="form-control" required=True %}
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label for="raza">Raza</label>
+                            {% render_field form.raza class="form-control" %}
+                        </div>
+                    </div>
+                
+                    <div class="form-group" style="width: 100%; margin-top: 10px;">
+                        <label for="descripcion">Descripción</label>
+                        {% render_field form.descripcion class="form-control" %}
+                    </div>
+                </div>
+              </section>
+
+              <!-- Paso 2: Ubicación -->
+              <h3>Ubicación</h3>
+              <section>
+                  <h5 class="bd-wizard-step-title">Paso 2</h5>
+                  <h2 class="section-heading">Ubicación del Animal</h2>
+                  <div id="autocomplete-container">
+                    {% render_field form.ubicacion class="form-control" placeholder="Escribe una ubicación..." %}
+                  </div>
+              </section>
+
+              <!-- Paso 3: Imágenes y Videos -->
+              <h3>Imágenes y Videos</h3>
+              <section>
+                <h5 class="bd-wizard-step-title">Paso 3</h5>
+                <h2 class="section-heading">Imágenes y Videos</h2>
+                
+                <!-- Campos para múltiples imágenes -->
+                <div class="form-group">
+                    <label>Subir Imágenes</label>
+                    <input type="file" name="images" multiple class="form-control" accept="image/*,video/*">
+                </div>
+
+                <!-- Campo de Enlace de Video -->
+                <div class="form-group">
+                    <label for="videoLink">Enlace de Video (YouTube)</label>
+                    {% render_field form.video_url class="form-control" %}
+                </div>
+              </section>
+              
+              <!-- Paso 4: Información Adicional de Venta -->
+              <h3>Información Adicional de Venta</h3>
+              <section>
+                  <h5 class="bd-wizard-step-title">Paso 4</h5>
+                  <h2 class="section-heading">Información Adicional de Venta</h2>
+                  <div class="form-group">
+                      <label for="precio">Precio</label>
+                      {% render_field form.precio class="form-control" %}
+                  </div>
+                  <div class="form-group">
+                      <label for="kg">Peso (KG)</label>
+                      {% render_field form.kg class="form-control" %}
+                  </div>
+              </section>
+
+
+            </div>
+        </form>
+    </div>
+</main>
+
+{% endblock content %}

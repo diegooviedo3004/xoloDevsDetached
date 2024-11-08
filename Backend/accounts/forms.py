@@ -5,8 +5,24 @@ from django.contrib.auth.forms import UserCreationForm
 User = get_user_model()
 
 class CustomUserCreationForm(UserCreationForm):
-    email = forms.EmailField(required=True, help_text='Requerido. Ingrese un correo electrónico válido.')
-
     class Meta:
         model = User
-        fields = ('email', 'first_name', 'last_name', 'avatar')
+        fields = ('first_name', 'last_name', 'email', 'password1', 'password2')
+        labels = {
+            'first_name': 'Nombre',
+            'last_name': 'Apellido',
+            'email': 'Correo electrónico',
+            'password1': 'Contraseña',
+            'password2': 'Confirma tu contraseña',
+        }
+
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'email', 'avatar')
+        labels = {
+            'first_name': 'Nombre',
+            'last_name': 'Apellido',
+            'email': 'Correo Electrónico',
+            'avatar': 'Foto de Perfil'
+        }
