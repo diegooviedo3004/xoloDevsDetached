@@ -1,3 +1,4 @@
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="en" class="">
@@ -25,12 +26,11 @@
     <!-- Main css -->
     <link rel="stylesheet" href="{% static 'assets/css/main.css' %}">
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-
     <link rel="stylesheet" href="{% static 'assets/css/bd-wizard.css' %}">
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 
     <style>
-      #map { height: 400px; }
       #autocomplete-container { position: relative; }
       #autocomplete-list { position: absolute; background: white; border: 1px solid #ccc; max-height: 150px; overflow-y: auto; width: 100%; }
       .autocomplete-item { padding: 5px; cursor: pointer; }
@@ -437,6 +437,7 @@
 <script src="{% static 'assets/js/jquery.steps.min.js' %}"></script>
 
 <script src="{% static 'assets/js/bd-wizard.js' %}"></script>
+
 
 </body>
 </html>

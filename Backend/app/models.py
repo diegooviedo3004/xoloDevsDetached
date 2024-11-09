@@ -66,13 +66,13 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Post(models.Model):
     SEX_CHOICES = [
-        ('M', 'Male'),
-        ('F', 'Female'),
+        ('M', 'Macho'),
+        ('F', 'Hembra'),
     ]
 
     POST_CHOICES = [
-        ('Auction', 'Auction'),
-        ('Post', 'Post'),
+        ('Auction', 'Subasta'),
+        ('Post', 'Publicación'),
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -81,10 +81,10 @@ class Post(models.Model):
     sex = models.CharField(max_length=1, choices=SEX_CHOICES)
     breed = models.CharField(max_length=100)
     location = models.CharField(max_length=100)
-    starting_price = models.DecimalField(max_digits=10, decimal_places=2)
+    starting_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     weight = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
-    traceability = models.BooleanField(default=False)
-    lot = models.BooleanField(default=False)
+    traceability = models.BooleanField(default=False, blank=True)
+    lot = models.BooleanField(default=False, blank=True)
     type = models.CharField(choices=POST_CHOICES, max_length=50, default='Post')
     video_url = models.URLField(blank=True, null=True)
     draft = models.BooleanField(default=True)

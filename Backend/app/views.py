@@ -3,15 +3,17 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import CreateView, TemplateView
+from django.views.generic import CreateView, TemplateView, ListView
 from .forms import PostForm
 from django.urls import reverse_lazy
 from rest_framework.viewsets import ModelViewSet
-from .models import Post
+from .models import Post, PostImage
 from .serializers import PostSerializer
 
-class IndexView(TemplateView):
+class IndexView(ListView):
+    model = Post
     template_name = "app/index.html"
+    context_object_name = 'posts'
 
 class CreatePostView(TemplateView):
     template_name = "app/create_post.html"
@@ -29,9 +31,17 @@ class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
     form_class = PostForm
     template_name = 'app/create_post.html'
-    success_url = reverse_lazy('post_list')  # Cambia esto con la URL donde redirigirás tras el guardado exitoso
+    success_url = reverse_lazy('home') 
 
     def form_valid(self, form):
-        # Asigna el usuario autenticado al post antes de guardarlo
-        form.instance.user = self.request.user
-        return super().form_valid(form)
+        form.instance.user = self.request.user  
+        response = super().form_valid(form)
+          
+        if form.instance.type == 'Post': 
+            form.instance.end_date = None
+
+        images = self.request.FILES.getlist('images')  
+        for image in images:
+            PostImage.objects.create(post=form.instance, image=image)  
+
+        return response
