@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import { View, Text, ScrollView, Image, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { GlobalStyleSheet } from '../../constants/StyleSheet';
@@ -12,6 +12,8 @@ import { addTowishList } from '../../redux/reducer/wishListReducer';
 import ImageSwiper from '../../components/ImageSwiper';
 import Cardstyle4 from '../../components/Card/Cardstyle4';
 import { openDrawer } from '../../redux/actions/drawerAction';
+import {gettingAllPost} from "./ViewModel/gettingAllPost";
+import {useAuthStore} from "../../store/useAuthStore";
 
 
 const ArrivalData = [
@@ -118,6 +120,23 @@ const SwiperData = [
 type HomeScreenProps = StackScreenProps<RootStackParamList, 'Home'>
 
 export const Home = ({ navigation }: HomeScreenProps) => {
+    const [post, setPost] = useState<any[]>([]); // Inicializamos como un array vacío
+    const [loading, setLoading] = useState(true); // Estado de carga
+    const { access } = useAuthStore();
+
+    useEffect(() => {
+        const fetchPosts = async () => {
+            const data = await gettingAllPost(access);
+            if (data) {
+                setPost(data);
+            } else {
+                setPost([]);
+            }
+            setLoading(false);
+        };
+
+        fetchPosts();
+    }, [access]);
 
     // const wishList = useSelector((state:any) => state.wishList.wishList);
     // console.log(wishList);
@@ -130,7 +149,7 @@ export const Home = ({ navigation }: HomeScreenProps) => {
     const addItemToWishList = (data: any) => {
         dispatch(addTowishList(data));
     }
-    
+
     return (
         <View style={{ backgroundColor: colors.card, flex: 1 }}>
             <View style={{}}>
@@ -289,14 +308,15 @@ export const Home = ({ navigation }: HomeScreenProps) => {
                 {/*</View>*/}
                 <View style={[GlobalStyleSheet.container,{paddingHorizontal:30,flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between",  alignItems: "start", marginTop: 5 }]}>
 
-                        {CardStyleData.map((data:any, index:any) => {
+                        {post?.map((data:any, index:any) => {
                             return (
                                     <Cardstyle4
                                         key={index}
+                                        direccion={data.location}
                                         id={data.id}
-                                        image={data.image}
-                                        price={data.price}
-                                        countnumber={data.countnumber}
+                                        image={IMAGES.vacasCards1}
+                                        price={data.starting_price}
+                                        // countnumber={data.countnumber}
                                         title={data.title}
                                         onPress={() => navigation.navigate('ProductsDetails')}
                                         onPress5={() => addItemToWishList(data)}
@@ -368,7 +388,7 @@ const styles = StyleSheet.create({
         //textAlign:'right'
     },
     colorCard:{
-        
+
     },
     colorCardTitle:{
         ...FONTS.fontMedium,
@@ -393,7 +413,7 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 0.34,
         shadowRadius: 18.27,
-        elevation: 4, 
+        elevation: 4,
     }
 })
 
