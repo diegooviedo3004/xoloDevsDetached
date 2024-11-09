@@ -81,6 +81,8 @@ class Post(models.Model):
     sex = models.CharField(max_length=1, choices=SEX_CHOICES)
     breed = models.CharField(max_length=100)
     location = models.CharField(max_length=100)
+    lat = models.TextField(null=True, blank=True)
+    long = models.TextField(null=True, blank=True)
     starting_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     weight = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
     traceability = models.BooleanField(default=False, blank=True)
