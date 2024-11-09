@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import CreateView, TemplateView, ListView
+from django.views.generic import CreateView, TemplateView, ListView, DetailView
 from .forms import PostForm
 from django.urls import reverse_lazy
 from rest_framework.viewsets import ModelViewSet
@@ -20,6 +20,19 @@ class IndexView(ListView):
 
 class CreatePostView(TemplateView):
     template_name = "app/create_post.html"
+
+class PostDetailView(DetailView):
+    model = Post
+    template_name = 'app/post_detail.html'  
+    context_object_name = 'post'      
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['images'] = self.object.images.all()  
+        print(context['images'][0].image.url)
+        # context['bids'] = self.object.bids.all()       
+        # context['highest_bid'] = self.object.get_highest_bid()  
+        return context
 
 class ContactView(TemplateView):
     template_name = "app/contact.html"

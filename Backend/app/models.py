@@ -44,6 +44,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(_('staff status'), default=False)
     is_superuser = models.BooleanField(default=False) 
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
+    phone_number = models.CharField(max_length=8, null=True)
 
     objects = UserManager()
 
@@ -66,19 +67,19 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Post(models.Model):
     SEX_CHOICES = [
-        ('M', 'Macho'),
-        ('F', 'Hembra'),
+        ('Macho', 'Macho'),
+        ('Hembra', 'Hembra'),
     ]
 
     POST_CHOICES = [
         ('Auction', 'Subasta'),
-        ('Post', 'Publicación'),
+        ('Post', 'Anuncio'),
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
     description = models.TextField()
-    sex = models.CharField(max_length=1, choices=SEX_CHOICES)
+    sex = models.CharField(max_length=10, choices=SEX_CHOICES)
     breed = models.CharField(max_length=100)
     location = models.CharField(max_length=100)
     lat = models.TextField(null=True, blank=True)

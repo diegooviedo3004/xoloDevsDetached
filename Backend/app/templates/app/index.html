@@ -70,12 +70,12 @@
                     {% for post in posts %}
                         <div class="col-xxl-2 col-lg-3 col-sm-4 col-6" data-aos="fade-up" data-aos-duration="200">
                             <div class="product-card h-100 p-8 border border-gray-100 hover-border-main-600 rounded-16 position-relative transition-2">
-                                <a href="../../../../../../Downloads/XoloDevsFront-main/XoloDevsFront-main/product-details.html" class="product-card__thumb flex-center">
+                                <a href="{% url 'post_detail' post.id %}" class="product-card__thumb flex-center">
                                     <img src="https://www.tn8.tv/wp-content/uploads/2021/04/ganaderia-nicaragua-05.jpg" alt="Ganado en Venta">
                                 </a>
                                 <div class="product-card__content p-sm-2 w-100">
                                     <h6 class="title text-lg fw-semibold mt-12 mb-8">
-                                        <a href="../../../../../../Downloads/XoloDevsFront-main/XoloDevsFront-main/product-details.html" class="link text-line-2">{{ post.title }} - {{ post.weight }}</a>
+                                        <a href="{% url 'post_detail' post.id %}" class="link text-line-2">{{ post.title }} - {{ post.weight }}</a>
                                     </h6>
                                     <div class="flex-align gap-4">
                                         <span class="text-main-600 text-md d-flex"><i class="ph-fill ph-storefront"></i></span>
@@ -92,8 +92,8 @@
                                             <span class="text-heading text-md fw-semibold ">${{ post.starting_price }}  </span>
                                         </div>
 
-                                        <a href="../../../../../../Downloads/XoloDevsFront-main/XoloDevsFront-main/cart.html" class="product-card__cart btn bg-main-50 text-main-600 hover-bg-main-600 hover-text-white py-11 px-24 rounded-pill flex-align gap-8 mt-24 w-100 justify-content-center">
-                                            Añadir al Carrito <i class="ph ph-shopping-cart"></i>
+                                        <a href="{% url 'post_detail' post.id %}" class="product-card__cart btn bg-main-50 text-main-600 hover-bg-main-600 hover-text-white py-11 px-24 rounded-pill flex-align gap-8 mt-24 w-100 justify-content-center">
+                                            Ver más <i class="ph ph-shopping-cart"></i>
                                         </a>
                                     </div>
                                 </div>
