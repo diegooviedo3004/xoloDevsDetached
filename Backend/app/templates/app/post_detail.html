@@ -55,33 +55,16 @@
                             </div>
 
                             <div class="mt-24">
-                                <div class="product-details__images-slider">
+                                {% for image in images %}
                                     <div>
                                         <div class="max-w-120 max-h-120 h-100 flex-center border border-gray-100 rounded-16 p-8">
-                                            <img src="{% static 'assets/images/thumbs/product-details-img1.png' %}" alt="">
+                                            <img src="{{ image.image.url }}" alt="">
                                         </div>
                                     </div>
-                                    <div>
-                                        <div class="max-w-120 max-h-120 h-100 flex-center border border-gray-100 rounded-16 p-8">
-                                            <img src="{% static 'assets/images/thumbs/product-details-img2.png' %}" alt="">
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="max-w-120 max-h-120 h-100 flex-center border border-gray-100 rounded-16 p-8">
-                                            <img src="{% static 'assets/images/thumbs/product-details-img3.png' %}" alt="">
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="max-w-120 max-h-120 h-100 flex-center border border-gray-100 rounded-16 p-8">
-                                            <img src="{% static 'assets/images/thumbs/product-details-img1.png' %}" alt="">
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="max-w-120 max-h-120 h-100 flex-center border border-gray-100 rounded-16 p-8">
-                                            <img src="{% static 'assets/images/thumbs/product-details-img2.png' %}" alt="">
-                                        </div>
-                                    </div>
-                                </div>
+                                    {% empty %}
+                                    <p>No hay imágenes disponibles para este post.</p>
+                                {% endfor %}
+                                
                             </div>
                         </div>
                     </div>

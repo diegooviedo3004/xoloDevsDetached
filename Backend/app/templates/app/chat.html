@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card" style="border-radius: 15px;">
+            <div class="card-body">
+              <div class="row">
+                <!-- Sidebar con la lista de chats -->
+                <div class="col-md-6 col-lg-5 col-xl-4 mb-4">
+                  <div class="p-3">
+                    <div class="input-group rounded mb-3">
+                      <h6>Chats</h6>
+                    </div>
+  
+                    <div style="height: 400px; overflow-y: auto;">
+                      <ul class="list-unstyled mb-0">
+                        {% for conversation in conversations %}
+    <li class="p-2 border-bottom">
+      <a href="#!" 
+         class="d-flex justify-content-between align-items-center text-decoration-none"
+         onclick="showConversation({{ conversation.id }})">
+        <div class="d-flex align-items-center">
+          <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp"
+            alt="avatar" class="rounded-circle me-3" width="60">
+          <div>
+            <!-- Muestra el nombre del otro usuario -->
+            <p class="fw-bold mb-0">{{ conversation.other_user.get_full_name }}</p>
+            <!-- Muestra el último mensaje si existe -->
+            {% if conversation.last_message %}
+              <p class="small text-muted">{{ conversation.last_message.content }}</p>
+            {% else %}
+              <p class="small text-muted">No hay mensajes</p>
+            {% endif %}
+          </div>
+        </div>
+        <div class="text-end">
+          <!-- Muestra la fecha del último mensaje si existe -->
+          {% if conversation.last_message %}
+            <p class="small text-muted mb-1">
+              {{ conversation.last_message.timestamp|date:"M d, Y H:i" }}
+            </p>
+          {% endif %}
+        </div>
+      </a>
+    </li>
+    {% empty %}
+      <p class="text-center">No tienes conversaciones.</p>
+    {% endfor %}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+  
+                <!-- Chatbox (Inicialmente vacío) -->
+                <div class="col-md-6 col-lg-7 col-xl-8">
+                  <div id="chatbox">
+                    <p class="text-center text-muted">Selecciona una conversación para ver los mensajes</p>
+  
+                    {% for conversation in conversations %}
+                    <!-- Div oculto para cada conversación, que se mostrará cuando el usuario haga clic -->
+                    <div id="conversation-{{ conversation.id }}" class="chat-content" style="display: none;">
+                      <div class="pt-3 pe-3" style="height: 400px; overflow-y: auto;">
+                        {% for message in conversation.messages.all %}
+                        <div class="d-flex {% if message.sender == request.user %}justify-content-end{% else %}justify-content-start{% endif %} mb-3">
+                          {% if message.sender != request.user %}
+                          <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp" alt="avatar" class="rounded-circle" style="width: 45px;">
+                          {% endif %}
+                          <div class="ms-3">
+                            <p class="small p-2 rounded-3 {% if message.sender == request.user %}bg-primary text-white{% else %}bg-light text-dark{% endif %}">{{ message.content }}</p>
+                            <p class="small text-muted">{{ message.timestamp|date:"M d, Y H:i" }}</p>
+                          </div>
+                          {% if message.sender == request.user %}
+                          <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp" alt="avatar" class="rounded-circle" style="width: 45px;">
+                          {% endif %}
+                        </div>
+                        {% endfor %}
+                      </div>
+                    </div>
+                    {% endfor %}
+                  </div>
+  
+                  <!-- Message input -->
+                  <form id="messageForm" method="POST" class="d-flex align-items-center p-3" action="">
+                    {% csrf_token %}
+                    <input type="text" name="content" class="form-control form-control-lg" placeholder="Type message" id="messageInput">
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+      const messageInput = document.getElementById('messageInput');
+        messageInput.style.display ='none';
+
+    // Función para mostrar la conversación seleccionada
+    function showConversation(conversationId) {
+      // Ocultar todas las conversaciones
+      document.querySelectorAll('.chat-content').forEach(chat => {
+        chat.style.display = 'none';
+    });
+  
+      // Mostrar la conversación seleccionada
+      const selectedChat = document.getElementById(`conversation-${conversationId}`);
+      if (selectedChat) {
+        selectedChat.style.display = 'block';
+        messageInput.style.display ='block';
+
+      }
+
+      // Establecer la acción del formulario para la conversación seleccionada
+    const messageForm = document.getElementById('messageForm');
+    messageForm.action = `{% url 'send_message' 0 %}`.replace('0', conversationId);
+    }
+  </script>
+  
+  
+{% endblock content %}
+    

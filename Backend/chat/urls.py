@@ -6,4 +6,5 @@ urlpatterns = [
     path('socket.io/', sio.handle_request),  
     path('conversations/', ConversationListView.as_view(), name='conversation-list'),
     path('conversations/<int:user_id>/', ConversationDetailView.as_view(), name='conversation-detail'),
+
 ]
