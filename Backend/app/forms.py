@@ -4,15 +4,15 @@ from .models import Post, PostImage
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ['descripcion', 'sexo', 'raza', 'ubicacion', 'precio', 'kg', 'trazabilidad', 'video_url', 'draft']
+        fields = ['description', 'sex', 'breed', 'location', 'starting_price', 'weight', 'traceability', 'video_url', 'draft']
         labels = {
-            'descripcion': 'Descripción',
-            'sexo': 'Sexo',
-            'raza': 'Raza',
-            'ubicacion': 'Ubicación',
-            'precio': 'Precio',
-            'kg': 'Peso (KG)',
-            'trazabilidad': 'Trazabilidad',
+            'description': 'Descripción',
+            'sex': 'Sexo',
+            'breed': 'Raza',
+            'location': 'Ubicación',
+            'starting_price': 'Precio',
+            'weight': 'Peso (KG)',
+            'traceability': 'Trazabilidad',
             'video_url': 'Enlace de Video (YouTube)',
             'draft': 'Borrador'
         }
