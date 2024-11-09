@@ -3,48 +3,151 @@
 {% load widget_tweaks %}
 
 {% block content %}
-    
+<style>
+    .leaflet-container {
+        width: 100%; 
+        height: 400px;
+    }
+    #autocomplete-container { position: relative; margin-top: 10px; }
+    #autocomplete-list { position: absolute; background: white; border: 1px solid #ccc; max-height: 150px; overflow-y: auto; width: 100%; }
+    .autocomplete-item { padding: 5px; cursor: pointer; }
+    .autocomplete-item:hover { background-color: #e9e9e9; }
+
+    .leaflet-control-container{z-index: 50;}
+    #autocomplete-list{z-index: 1001;}
+  </style>  
+
 <main class="d-flex align-items-center" style="margin-top: 2rem; margin-bottom: 10rem;">
     <div class="container">
-        <form method="post" enctype="multipart/form-data">
+        <form method="post" action="{% url 'create_post' %}" enctype="multipart/form-data" id="create_post_form">
             {% csrf_token %}
             <div id="wizard">
+                
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+
+                    
 
               <!-- Paso 1: Información Básica del Animal -->
+              <h3 class="mt-5">Información Básica de la publicación</h3>
+              <section>
+                    <h5 class="bd-wizard-step-title mb-0">Paso 1</h5>
+                    <h2 class="section-heading">Información Básica de la publicación</h2>
+                    <div class="container">
+                        
+                        <div class="form-group" style="width: 100%; margin-top: 10px;">
+                            <label for="descripcion">Tipo de publicación</label>
+                            {% render_field form.type class="form-control" %}
+                            {% if form.type.errors %}
+                                <div class="">
+                                    {% for error in form.type.errors %}
+                                        <p style="color: red;">{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group" style="width: 100%; margin-top: 10px;">
+                            <label for="descripcion">Título</label>
+                            {% render_field form.title class="form-control" %}
+                            {% if form.title.errors %}
+                                <div class="">
+                                    {% for error in form.title.errors %}
+                                        <p style="color: red;">{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            
+                        </div>
+                    
+                        <div class="form-group" style="width: 100%; margin-top: 10px;">
+                            <label for="descripcion">Descripción</label>
+                            {% render_field form.description class="form-control" %}
+                            {% if form.description.errors %}
+                                <div class="">
+                                    {% for error in form.description.errors %}
+                                        <p style="color: red;">{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    
+                        <div class="form-group" style="width: 100%; margin-top: 10px;">
+                            <label for="descripcion">Fecha final de subasta</label>
+                            {% render_field form.end_date class="form-control" required=False %}
+                            {% if form.end_date.errors %}
+                                <div class="">
+                                    {% for error in form.end_date.errors %}
+                                        <p style="color: red;">{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group" style="width: 100%; margin-top: 10px;">
+                            <label for="descripcion">Ubicación</label>
+                            <div id="autocomplete-container">
+                            
+                                {% render_field form.location class="form-control" placeholder="Escribe una ubicación..." onkeyup="searchLocation()" %}
+                                {% if form.location.errors %}
+                                    <div class="">
+                                        {% for error in form.location.errors %}
+                                            <p style="color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <div id="autocomplete-list"></div>
+                            </div>
+                            <div id="map"></div>
+                        </div>
+                    
+
+                        
+                    </div>
+                </section>
+
+
               <h3>Información Básica del Animal</h3>
               <section>
-                  <h5 class="bd-wizard-step-title">Paso 1</h5>
+                  <h5 class="bd-wizard-step-title">Paso 2</h5>
                   <h2 class="section-heading">Información Básica del Animal</h2>
                   <div class="container">
                     <div style="display: flex; gap: 10px;">
                         <div class="form-group" style="flex: 1;">
                             <label for="sexo">Sexo</label>
-                            {% render_field form.sexo class="form-control" required=True %}
+                            {% render_field form.sex class="form-control" required=True %}
+                            {% if form.sex.errors %}
+                                <div class="">
+                                    {% for error in form.sex.errors %}
+                                        <p style="color: red;">{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                         </div>
                         <div class="form-group" style="flex: 1;">
                             <label for="raza">Raza</label>
-                            {% render_field form.raza class="form-control" %}
+                            {% render_field form.breed class="form-control" %}
+                            {% if form.breed.errors %}
+                                <div class="">
+                                    {% for error in form.breed.errors %}
+                                        <p style="color: red;">{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                 
-                    <div class="form-group" style="width: 100%; margin-top: 10px;">
-                        <label for="descripcion">Descripción</label>
-                        {% render_field form.descripcion class="form-control" %}
-                    </div>
+                    
                 </div>
               </section>
 
-              <!-- Paso 2: Ubicación -->
-              <h3>Ubicación</h3>
-              <section>
-                  <h5 class="bd-wizard-step-title">Paso 2</h5>
-                  <h2 class="section-heading">Ubicación del Animal</h2>
-                  <div id="autocomplete-container">
-                    {% render_field form.ubicacion class="form-control" placeholder="Escribe una ubicación..." %}
-                  </div>
-              </section>
-
-              <!-- Paso 3: Imágenes y Videos -->
+              <!-- Paso 2: Imágenes y Videos -->
               <h3>Imágenes y Videos</h3>
               <section>
                 <h5 class="bd-wizard-step-title">Paso 3</h5>
@@ -53,28 +156,50 @@
                 <!-- Campos para múltiples imágenes -->
                 <div class="form-group">
                     <label>Subir Imágenes</label>
-                    <input type="file" name="images" multiple class="form-control" accept="image/*,video/*">
+                    <input type="file" name="images" id="images" multiple class="form-control" accept="image/*" onchange="validateFileCount(this)">
+                    <small class="text-danger mb-5" id="file-error" style="display: none;">Solo puedes subir un máximo de 9 imágenes.</small>                    
                 </div>
 
                 <!-- Campo de Enlace de Video -->
                 <div class="form-group">
                     <label for="videoLink">Enlace de Video (YouTube)</label>
                     {% render_field form.video_url class="form-control" %}
+                    {% if form.video_url.errors %}
+                        <div class="">
+                            {% for error in form.video_url.errors %}
+                                <p style="color: red;">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                 </div>
               </section>
               
-              <!-- Paso 4: Información Adicional de Venta -->
+              <!-- Paso 3: Información Adicional de Venta -->
               <h3>Información Adicional de Venta</h3>
               <section>
                   <h5 class="bd-wizard-step-title">Paso 4</h5>
                   <h2 class="section-heading">Información Adicional de Venta</h2>
                   <div class="form-group">
                       <label for="precio">Precio</label>
-                      {% render_field form.precio class="form-control" %}
+                    {% render_field form.starting_price class="form-control" %}
+                    {% if form.starting_price.errors %}
+                        <div class="">
+                            {% for error in form.starting_price.errors %}
+                                <p style="color: red;">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                   </div>
                   <div class="form-group">
                       <label for="kg">Peso (KG)</label>
-                      {% render_field form.kg class="form-control" %}
+                      {% render_field form.weight class="form-control" %}
+                      {% if form.weight.errors %}
+                        <div class="">
+                            {% for error in form.weight.errors %}
+                                <p style="color: red;">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                   </div>
               </section>
 
@@ -83,5 +208,83 @@
         </form>
     </div>
 </main>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const typeSelect = document.getElementById("id_type");
+        const endDateField = document.querySelector(".form-group #id_end_date").closest('.form-group');
+
+        const toggleEndDateField = () => {
+            if (typeSelect.value === "Auction") {  
+                endDateField.style.display = "block";
+            } else {
+                endDateField.style.display = "none";
+            }
+        }
+
+        toggleEndDateField();
+
+        typeSelect.addEventListener("change", toggleEndDateField);
+    });
+</script>
+<script>
+    function validateFileCount(input) {
+        const maxFiles = 9;
+        const fileError = document.getElementById('file-error');
+        
+        if (input.files.length > maxFiles) {
+            fileError.style.display = 'block'; 
+            input.value = ''; 
+        } else {
+            fileError.style.display = 'none'; 
+        }
+    }
+</script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+crossorigin=""></script>
+
+
+<script>
+    var map;
+    
+    document.addEventListener("DOMContentLoaded", function() {
+        map = L.map('map').setView([12.8654, -85.2072], 7);
+
+        map.invalidateSize()
+    
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        
+    });
+    // Función para realizar la búsqueda y mostrar sugerencias
+    async function searchLocation() {
+        const input = document.getElementById("id_location").value;
+        const autocompleteList = document.getElementById("autocomplete-list");
+        autocompleteList.innerHTML = ""; // Limpiar lista de autocompletar
+
+        if (input.length < 3) return; // Espera a que el usuario escriba al menos 3 caracteres
+
+        const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${input}&addressdetails=1&limit=5&countrycodes=NI`);
+        const locations = await response.json();
+
+        locations.forEach(location => {
+        const item = document.createElement("div");
+        item.classList.add("autocomplete-item");
+        item.textContent = location.display_name;
+        item.onclick = () => {
+            // Centramos el mapa en la ubicación seleccionada
+            map.setView([location.lat, location.lon], 13);
+            autocompleteList.innerHTML = ""; // Limpiar lista de autocompletar
+            document.getElementById("id_location").value = location.display_name
+        };
+        autocompleteList.appendChild(item);
+        
+        });
+    }
+</script>
 
 {% endblock content %}

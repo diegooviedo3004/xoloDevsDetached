@@ -2,19 +2,29 @@ from django import forms
 from .models import Post, PostImage
 
 class PostForm(forms.ModelForm):
+    end_date = forms.DateTimeField(
+        widget=forms.DateInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
+        label='Fecha final de subasta',
+        required=False,
+    )
+
     class Meta:
         model = Post
-        fields = ['descripcion', 'sexo', 'raza', 'ubicacion', 'precio', 'kg', 'trazabilidad', 'video_url', 'draft']
+        fields = ['title', 'description', 'type', 'sex', 'breed', 'location', 'starting_price', 'weight', 'traceability', 'video_url', 'draft', 'end_date']
         labels = {
-            'descripcion': 'Descripción',
-            'sexo': 'Sexo',
-            'raza': 'Raza',
-            'ubicacion': 'Ubicación',
-            'precio': 'Precio',
-            'kg': 'Peso (KG)',
-            'trazabilidad': 'Trazabilidad',
+            'title': 'Título',
+            'description': 'Descripción',
+            'type': 'Tipo de publicación',
+            'sex': 'Sexo',
+            'breed': 'Raza',
+            'location': 'Ubicación',
+            'starting_price': 'Precio',
+            'weight': 'Peso (KG)',
+            'traceability': 'Trazabilidad',
             'video_url': 'Enlace de Video (YouTube)',
-            'draft': 'Borrador'
+            'draft': 'Borrador',
+            'end_date': 'Fecha final de subasta',
+
         }
     
 class PostImageForm(forms.ModelForm):
