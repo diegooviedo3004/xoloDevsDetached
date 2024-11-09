@@ -51,7 +51,12 @@
       }
     },
     "plugins": [
-      ["@maplibre/maplibre-react-native"],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
+        }
+      ],
       [
         "expo-camera",
         {

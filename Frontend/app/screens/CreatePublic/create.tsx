@@ -1,16 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, Image, Alert, Switch, Modal } from 'react-native';
+import { View, Text, StyleSheet, Alert, FlatList, Image, Modal, TouchableOpacity, Switch, TextInput } from 'react-native';
 import { Button } from "react-native-paper";
 import { useTheme } from "@react-navigation/native";
 import { ProgressStep, ProgressSteps } from "@ouedraogof/react-native-progress-steps";
-import MapLibreGL from '@maplibre/maplibre-react-native';
 import * as ImagePicker from 'expo-image-picker';
+import MapView, { Marker, Region } from 'react-native-maps';
+import Header from "../../layout/Header";
+import Input from "../../components/Input/Input";
+import useLocation from "../../Hook/useLocation";
+import { Feather } from "@expo/vector-icons";
+import { FONTS } from "../../constants/theme";
 
-export default function CreatePublication() {
+interface LocationDataItem {
+    key: string;
+    value: string;
+    coordinates: {
+        latitude: number;
+        longitude: number;
+    };
+}
+
+const CreatePublication: React.FC = () => {
     const theme = useTheme();
-    const { colors }: { colors: any; } = theme;
-
-    const MAPTILER_API_KEY = "QUXFHoHbpEpQpWh3UBP7";
+    const { colors } = theme;
 
     const [formData, setFormData] = useState({
         titulo: '',
@@ -23,25 +35,59 @@ export default function CreatePublication() {
         usar_ubicacion_usuario: false,
     });
 
-    const [userCoordinates, setUserCoordinates] = useState<[number, number] | null>(null);
     const [images, setImages] = useState<string[]>([]);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [latitude, setLatitude] = useState<number>(12.8654);
+    const [longitude, setLongitude] = useState<number>(-85.2072);
+    const [locationData, setLocationData] = useState<LocationDataItem[]>([]);
+    const [searchText, setSearchText] = useState<string>('');
+
+    const { location } = useLocation();
 
     useEffect(() => {
-        // Solicitar y obtener coordenadas del usuario si está habilitado
-        if (formData.usar_ubicacion_usuario) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const { latitude, longitude } = position.coords;
-                    setUserCoordinates([longitude, latitude]);
-                },
-                (error) => console.error("Error obteniendo ubicación", error),
-                { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
-            );
+        console.log("==> location", location);
+        if (formData.usar_ubicacion_usuario && location) {
+            setLatitude(location.latitude);
+            setLongitude(location.longitude);
         }
-    }, [formData.usar_ubicacion_usuario]);
+    }, [formData.usar_ubicacion_usuario, location]);
 
-    const handleInputChange = (name: string, value: string | boolean) => {
+    const mapRegion: Region = {
+        latitude: latitude,
+        longitude: longitude,
+        latitudeDelta: 0.05,
+        longitudeDelta: 0.05,
+    };
+
+    useEffect(() => {
+        if (searchText.length >= 3) {
+            searchLocation(searchText);
+        }
+    }, [searchText]);
+
+    const searchLocation = async (input: string) => {
+        try {
+            const response = await fetch(
+                `https://nominatim.openstreetmap.org/search?format=json&q=${input}&addressdetails=1&limit=5&countrycodes=NI`
+            );
+            const locations = await response.json();
+
+            const searchResults: LocationDataItem[] = locations.map((location: any) => ({
+                key: location.place_id.toString(),
+                value: location.display_name,
+                coordinates: {
+                    latitude: parseFloat(location.lat),
+                    longitude: parseFloat(location.lon),
+                },
+            }));
+            setLocationData(searchResults);
+        } catch (error) {
+            console.error('Error fetching location data:', error);
+            Alert.alert('Error', 'No se pudo obtener datos de la ubicación.');
+        }
+    };
+
+    const handleInputChange = (name: keyof typeof formData, value: string | boolean) => {
         setFormData({ ...formData, [name]: value });
     };
 
@@ -53,7 +99,7 @@ export default function CreatePublication() {
         });
 
         if (!result.canceled) {
-            const selectedImages = result.assets.map(asset => asset.uri);
+            const selectedImages = result.assets.map((asset: any) => asset.uri);
             const totalImages = [...images, ...selectedImages].slice(0, 9);
             setImages(totalImages);
 
@@ -63,67 +109,44 @@ export default function CreatePublication() {
         }
     };
 
-    const removeImage = (index: number) => {
-        const newImages = [...images];
-        newImages.splice(index, 1);
-        setImages(newImages);
-    };
-
-    const showImage = (uri: string) => {
-        setSelectedImage(uri);
-    };
-
-    const closeImage = () => {
-        setSelectedImage(null);
-    };
-
     const submitForm = () => {
         Alert.alert("Publicación creada", "Tu publicación ha sido creada exitosamente.");
     };
 
-    const centerCoordinates = formData.usar_ubicacion_usuario && userCoordinates
-        ? userCoordinates
-        : [-122.4194, 37.7749]; // Coordenadas por defecto
+    const buttonTextStyle = {
+        color: '#4CAF50',
+        fontWeight: 'bold' as const,
+    };
+
+    const activeStepStyles = {
+        activeStepIconBorderColor: '#4CAF50',
+        activeLabelColor: '#4CAF50',
+        activeStepNumColor: 'white',
+        activeStepIconColor: '#4CAF50',
+        completedStepIconColor: '#4CAF50',
+        completedProgressBarColor: '#4CAF50',
+        completedCheckColor: '#fff',
+    };
 
     return (
         <View style={{ backgroundColor: colors.card, flex: 1 }}>
-            <View style={{ flex: 1, marginTop: 50 }}>
-                <ProgressSteps>
-                    {/* Paso 1: Detalles Generales */}
-                    <ProgressStep label="Detalles Generales">
+            <Header title='Crear Venta' leftIcon='back' rightIcon1={'home'} />
+            <View style={{ flex: 1 }}>
+                <ProgressSteps {...activeStepStyles}>
+                    <ProgressStep label="Detalles Generales" nextBtnTextStyle={buttonTextStyle} previousBtnTextStyle={buttonTextStyle}>
                         <View style={{ padding: 16 }}>
                             <Text>Título</Text>
-                            <TextInput
-                                style={styles.input}
-                                placeholder="Título"
-                                value={formData.titulo}
-                                onChangeText={(text) => handleInputChange('titulo', text)}
-                            />
+                            <Input placeholder="Título" value={formData.titulo} onChangeText={(text) => handleInputChange('titulo', text)} />
                             <Text>Descripción</Text>
-                            <TextInput
-                                style={styles.input}
-                                placeholder="Descripción"
-                                value={formData.descripcion}
-                                onChangeText={(text) => handleInputChange('descripcion', text)}
-                            />
+                            <Input placeholder="Descripción" value={formData.descripcion} onChangeText={(text) => handleInputChange('descripcion', text)} />
                             <Text>Precio</Text>
-                            <TextInput
-                                style={styles.input}
-                                placeholder="Precio"
-                                value={formData.precio}
-                                onChangeText={(text) => handleInputChange('precio', text)}
-                            />
-
-                            {/* Selector de Sexo */}
+                            <Input placeholder="Precio" value={formData.precio} onChangeText={(text) => handleInputChange('precio', text)} />
                             <Text>Sexo</Text>
                             <View style={styles.optionContainer}>
                                 {['Hembra', 'Macho'].map(option => (
                                     <TouchableOpacity
                                         key={option}
-                                        style={[
-                                            styles.optionButton,
-                                            formData.sexo === option && styles.optionButtonSelected
-                                        ]}
+                                        style={[styles.optionButton, formData.sexo === option && styles.optionButtonSelected]}
                                         onPress={() => handleInputChange('sexo', option)}
                                     >
                                         <Text style={formData.sexo === option ? styles.optionTextSelected : styles.optionText}>
@@ -132,79 +155,80 @@ export default function CreatePublication() {
                                     </TouchableOpacity>
                                 ))}
                             </View>
-
-                            {/* Campo de texto para Raza */}
                             <Text>Raza</Text>
-                            <TextInput
-                                style={styles.input}
-                                placeholder="Raza"
-                                value={formData.raza}
-                                onChangeText={(text) => handleInputChange('raza', text)}
-                            />
+                            <Input placeholder="Raza" value={formData.raza} onChangeText={(text) => handleInputChange('raza', text)} />
                         </View>
                     </ProgressStep>
 
-                    {/* Paso 2: Configuración Adicional */}
-                    <ProgressStep label="Configuración Adicional">
+                    <ProgressStep label="Configuración Adicional" nextBtnTextStyle={buttonTextStyle} previousBtnTextStyle={buttonTextStyle}>
                         <View style={{ padding: 16 }}>
-                            <Text>Configurar Trazabilidad</Text>
-                            <Switch
-                                value={formData.trazabilidad}
-                                onValueChange={(value) => handleInputChange('trazabilidad', value)}
-                            />
-                            <Text>URL del Video</Text>
-                            <TextInput
-                                style={styles.input}
-                                placeholder="Enlace del video"
-                                value={formData.video_url}
-                                onChangeText={(text) => handleInputChange('video_url', text)}
-                            />
-
-                            {/* Imágenes */}
-                            <Text style={{ marginTop: 20 }}>Imágenes</Text>
-                            <Button onPress={pickImage}>Seleccionar imágenes</Button>
-                            <ScrollView horizontal style={{ marginTop: 10 }}>
-                                {images.map((imageUri, index) => (
-                                    <TouchableOpacity key={index} onPress={() => showImage(imageUri)}>
-                                        <Image source={{ uri: imageUri }} style={styles.selectedImage} />
-                                        <TouchableOpacity
-                                            style={styles.deleteButton}
-                                            onPress={() => removeImage(index)}
-                                        >
-                                            <Text style={{ color: 'white', fontWeight: 'bold' }}>X</Text>
+                            <View>
+                                <Text>Configurar Trazabilidad</Text>
+                                <Switch value={formData.trazabilidad} onValueChange={(value) => handleInputChange('trazabilidad', value)} />
+                            </View>
+                            <View>
+                                <Text>Usar Coordenadas del Usuario</Text>
+                                <Switch value={formData.usar_ubicacion_usuario} onValueChange={(value) => handleInputChange('usar_ubicacion_usuario', value)} />
+                            </View>
+                            <View>
+                                <Text>URL del Video</Text>
+                                <Input placeholder="Enlace del video" value={formData.video_url} onChangeText={(text) => handleInputChange('video_url', text)} />
+                            </View>
+                            <View>
+                                <Text style={{ marginTop: 20 }}>Imágenes</Text>
+                                <Button onPress={pickImage} mode="contained" style={{ marginVertical: 10, backgroundColor: '#4CAF50'}}>
+                                    Seleccionar imágenes
+                                </Button>
+                                <FlatList
+                                    horizontal
+                                    data={images}
+                                    keyExtractor={(item, index) => index.toString()}
+                                    renderItem={({ item, index }) => (
+                                        <TouchableOpacity onPress={() => setSelectedImage(item)}>
+                                            <Image source={{ uri: item }} style={styles.selectedImage} />
+                                            <TouchableOpacity style={styles.deleteButton} onPress={() => setImages(images.filter((_, i) => i !== index))}>
+                                                <Text style={{ color: 'white', fontWeight: 'bold' }}>X</Text>
+                                            </TouchableOpacity>
                                         </TouchableOpacity>
-                                    </TouchableOpacity>
-                                ))}
-                            </ScrollView>
-                            {images.length === 0 && <Text style={styles.errorText}>Se requiere al menos una imagen</Text>}
-                        </View>
-                    </ProgressStep>
-
-                    {/* Paso 3: Mapa */}
-                    <ProgressStep label="Mapa">
-                        <View style={{ padding: 16 }}>
-                            <Text>Usar Coordenadas del Usuario</Text>
-                            <Switch
-                                value={formData.usar_ubicacion_usuario}
-                                onValueChange={(value) => handleInputChange('usar_ubicacion_usuario', value)}
-                            />
-                            <View style={styles.mapPlaceholder}>
-                                {/*<MapLibreGL.MapView*/}
-                                {/*    style={styles.map}*/}
-                                {/*    styleURL={`https://api.maptiler.com/maps/streets-v2/style.json?key=${MAPTILER_API_KEY}`}*/}
-                                {/*    logoEnabled={false}*/}
-                                {/*    attributionPosition={{ bottom: 8, right: 8 }}*/}
-                                {/*>*/}
-                                {/*    <MapLibreGL.Camera*/}
-                                {/*        defaultSettings={{ centerCoordinate: centerCoordinates, zoomLevel: 8 }}*/}
-                                {/*    />*/}
-                                {/*</MapLibreGL.MapView>*/}
+                                    )}
+                                />
                             </View>
                         </View>
                     </ProgressStep>
 
-                    {/* Paso 4: Confirmación y Envío */}
-                    <ProgressStep label="Confirmación" onSubmit={submitForm}>
+                    <ProgressStep label="Mapa" nextBtnTextStyle={buttonTextStyle} previousBtnTextStyle={buttonTextStyle}>
+                        <View style={{ padding: 16 }}>
+                            <View style={styles.searchContainer}>
+                                <Feather name="search" size={20} color={colors.title} />
+                                <TextInput
+                                    style={styles.searchInput}
+                                    placeholder="Buscar ubicación..."
+                                    value={searchText}
+                                    onChangeText={setSearchText}
+                                />
+                            </View>
+                            <FlatList
+                                data={locationData}
+                                keyExtractor={(item) => item.key.toString()}
+                                renderItem={({ item }) => (
+                                    <TouchableOpacity onPress={() => {
+                                        setSearchText(item.value);
+                                        setLatitude(item.coordinates.latitude);
+                                        setLongitude(item.coordinates.longitude);
+                                    }}>
+                                        <Text style={styles.listItem}>{item.value}</Text>
+                                    </TouchableOpacity>
+                                )}
+                            />
+                            <View style={styles.mapPlaceholder}>
+                                <MapView style={StyleSheet.absoluteFillObject} region={mapRegion}>
+                                    <Marker coordinate={{ latitude: mapRegion.latitude, longitude: mapRegion.longitude }} />
+                                </MapView>
+                            </View>
+                        </View>
+                    </ProgressStep>
+
+                    <ProgressStep label="Confirmación" onSubmit={submitForm} nextBtnTextStyle={buttonTextStyle} previousBtnTextStyle={buttonTextStyle}>
                         <View style={{ alignItems: 'center', padding: 16 }}>
                             <Text>Revisa tus datos y envía la publicación</Text>
                         </View>
@@ -212,29 +236,18 @@ export default function CreatePublication() {
                 </ProgressSteps>
             </View>
 
-            {/* Modal para ver imagen en pantalla completa */}
             <Modal visible={!!selectedImage} transparent={true}>
                 <View style={styles.modalContainer}>
-                    <TouchableOpacity style={styles.modalCloseButton} onPress={closeImage}>
+                    <TouchableOpacity style={styles.modalCloseButton} onPress={() => setSelectedImage(null)}>
                         <Text style={styles.modalCloseText}>Cerrar</Text>
                     </TouchableOpacity>
-                    {selectedImage && (
-                        <Image source={{ uri: selectedImage }} style={styles.fullScreenImage} />
-                    )}
+                    {selectedImage && <Image source={{ uri: selectedImage }} style={styles.fullScreenImage} />}
                 </View>
             </Modal>
         </View>
     );
-}
-
+};
 const styles = StyleSheet.create({
-    input: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        padding: 8,
-        marginVertical: 8,
-        borderRadius: 4,
-    },
     optionContainer: {
         flexDirection: 'row',
         marginVertical: 10,
@@ -249,18 +262,14 @@ const styles = StyleSheet.create({
         marginRight: 5,
     },
     optionButtonSelected: {
-        backgroundColor: '#007aff',
-        borderColor: '#007aff',
+        backgroundColor: '#4CAF50',
+        borderColor: '#4CAF50',
     },
     optionText: {
         color: '#333',
     },
     optionTextSelected: {
         color: '#fff',
-    },
-    errorText: {
-        color: 'red',
-        fontSize: 12,
     },
     selectedImage: {
         width: 100,
@@ -276,6 +285,23 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         padding: 4,
     },
+    searchContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderBottomWidth: 1,
+        borderColor: '#ccc',
+        paddingHorizontal: 8,
+        marginVertical: 10,
+    },
+    searchInput: {
+        flex: 1,
+        padding: 8,
+    },
+    listItem: {
+        paddingVertical: 10,
+        borderBottomWidth: 1,
+        borderColor: '#ccc',
+    },
     mapPlaceholder: {
         height: 400,
         borderWidth: 1,
@@ -283,9 +309,6 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         overflow: 'hidden',
         marginVertical: 15,
-    },
-    map: {
-        flex: 1,
     },
     modalContainer: {
         flex: 1,
@@ -311,3 +334,5 @@ const styles = StyleSheet.create({
         resizeMode: 'contain',
     },
 });
+
+export default CreatePublication;

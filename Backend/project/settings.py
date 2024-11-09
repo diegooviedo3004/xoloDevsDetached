@@ -40,12 +40,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
     'corsheaders',
     'rest_framework',
     'djoser',
-    'widget_tweaks',
-
+    'widget_tweaks', 
+    'cloudinary_storage',
+    'cloudinary',
     'app',
     'chat',
     'accounts',
@@ -178,3 +178,12 @@ SIMPLE_JWT = {
 }
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'login'
+
+# Image
+MEDIA_URL = '/media/' 
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+CLOUDINARY_STORAGE = { 
+     'CLOUD_NAME': 'den3ccjvd', 
+     'API_KEY': '294527718744669', 
+     'API_SECRET': 'ZZE29WW763hftb2Oiq7QmeFvCQg' 
+ }
