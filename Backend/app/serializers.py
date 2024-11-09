@@ -6,6 +6,11 @@ class PostImageSerializer(serializers.ModelSerializer):
         model = PostImage
         fields = ['id', 'image']
 
+class PostsByUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = '__all__'
+
 class PostSerializer(serializers.ModelSerializer):
     images = serializers.SerializerMethodField()  # Use SerializerMethodField to fetch images
 

@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+from rest_framework import generics
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -8,8 +9,10 @@ from .forms import PostForm
 from django.urls import reverse_lazy
 from rest_framework.viewsets import ModelViewSet
 from .models import Post, PostImage
-from .serializers import PostSerializer
+from .serializers import PostSerializer, PostsByUserSerializer
+from django.contrib.auth import get_user_model
 
+User = get_user_model()
 class IndexView(ListView):
     model = Post
     template_name = "app/index.html"
@@ -26,6 +29,15 @@ class PostViewSet(ModelViewSet):
 
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+
+class PostsByUser(generics.ListAPIView):
+    serializer_class = PostsByUserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user_id = self.kwargs['user_id']
+        user = get_object_or_404(User, id=user_id)
+        return Post.objects.filter(user=user)
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
