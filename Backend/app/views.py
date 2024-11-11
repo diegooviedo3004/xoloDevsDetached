@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import CreateView, TemplateView, ListView, DetailView
-from .forms import PostForm
+#from .forms import PostForm
 from django.urls import reverse_lazy
 from rest_framework.viewsets import ModelViewSet
 from .models import Post, PostImage
@@ -51,7 +51,7 @@ class PostsByUser(generics.ListAPIView):
         user_id = self.kwargs['user_id']
         user = get_object_or_404(User, id=user_id)
         return Post.objects.filter(user=user)
-
+"""
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
     form_class = PostForm
@@ -70,3 +70,4 @@ class PostCreateView(LoginRequiredMixin, CreateView):
             PostImage.objects.create(post=form.instance, image=image)  
 
         return response
+"""

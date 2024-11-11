@@ -1,6 +1,7 @@
 from django import forms
 from .models import Post, PostImage
 
+"""
 class PostForm(forms.ModelForm):
     end_date = forms.DateTimeField(
         widget=forms.DateInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
@@ -31,3 +32,4 @@ class PostImageForm(forms.ModelForm):
     class Meta:
         model = PostImage
         fields = ['image']
+        """

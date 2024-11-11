@@ -7,6 +7,13 @@ from django.utils import timezone
 from decimal import Decimal
 
 
+class TimeStampedModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
 class UserManager(BaseUserManager):
     use_in_migrations = True
 
@@ -65,7 +72,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
 
-class Post(models.Model):
+class Post(TimeStampedModel):
     SEX_CHOICES = [
         ('Macho', 'Macho'),
         ('Hembra', 'Hembra'),
@@ -80,57 +87,148 @@ class Post(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
     sex = models.CharField(max_length=10, choices=SEX_CHOICES)
-    breed = models.CharField(max_length=100)
+
+    RAZAS_CHOICES = [
+        ('angus', 'Angus'),
+        ('holstein', 'Holstein'),
+        ('charolais', 'Charolais'),
+        ('brahman', 'Brahman'),
+        ('limousin', 'Limousin'),
+        ('simmental', 'Simmental'),
+        ('hereford', 'Hereford'),
+        ('pardo_suizo', 'Pardo Suizo'),
+        ('santa_gertrudis', 'Santa Gertrudis'),
+        ('gyr', 'Gyr'),
+        ('girolando', 'Girolando'),
+        ('otro', 'Otro'),  # Opción para otras razas no listadas
+    ]
+    
+    breed = models.CharField(max_length=20, choices=RAZAS_CHOICES, default='otro')
+    
     location = models.CharField(max_length=100)
-    lat = models.TextField(null=True, blank=True)
-    long = models.TextField(null=True, blank=True)
+
+    lat = models.TextField()
+    long = models.TextField()
+
     starting_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     weight = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
     traceability = models.BooleanField(default=False, blank=True)
     lot = models.BooleanField(default=False, blank=True)
-    type = models.CharField(choices=POST_CHOICES, max_length=50, default='Post')
+    post_type = models.CharField(choices=POST_CHOICES, max_length=50, default='Post')
     video_url = models.URLField(blank=True, null=True)
-    draft = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    end_date = models.DateTimeField(null=True, blank=True)
-    is_active = models.BooleanField(default=True)
+    approved = models.BooleanField(default=False) # Si ya lo aprobamos manualmente
+    is_active = models.BooleanField(default=True) #Soft delete 
 
     def __str__(self):
         return f"{self.description[:20]} - {self.type}"
 
-    def is_auction_active(self):
-        """Check if the auction is active based on the end date and current time."""
-        return self.is_active and self.end_date > timezone.now()
+    
+   
 
-    def get_highest_bid(self):
-        """Get the highest bid placed on this post."""
-        highest_bid = self.bids.order_by('-amount').first()
-        return highest_bid.amount if highest_bid else None
+  
 
-    def place_bid(self, user, amount):
-        """Method to handle placing a bid."""
-        highest_bid = self.get_highest_bid()
-        if highest_bid and amount <= highest_bid:
-            raise ValueError("Bid must be higher than the current highest bid.")
-        return Bid.objects.create(post=self, user=user, amount=amount)
+class Categoria(TimeStampedModel):
+    name = models.CharField(max_length = 100)
+    descripcion = models.TextField(null = True, blank = True)
+
+class Vacuna(TimeStampedModel):
+    name = models.CharField(max_length = 100)
+
+class InfoReproductiva(TimeStampedModel):
+    trazabilidad = models.ForeignKey('Trazabilidad', models.SET_NULL, null=True)
+    fecha_de_nacimiento = models.DateField(null=True, blank=True)
+    ultimo_parto = models.DateField(null=True, blank=True)
+    fecha_de_prenez = models.DateField(null=True, blank=True)
+    fecha_de_ultimo_celo = models.DateField(null=True, blank=True)
+    dias_de_prenez = models.IntegerField(null=True, blank=True, default=0)
+    fecha_esperada_parto = models.DateField(null=True, blank=True)
+    produccion_leche_litros = models.IntegerField(null=True, blank=True, default=0)
+
+class InfoLechera(TimeStampedModel):
+    trazabilidad = models.ForeignKey('Trazabilidad', models.SET_NULL, null=True)
+    produccion_diaria_litros = models.IntegerField(null=True, blank=True, default=0)
+    dias_de_lactancia = models.IntegerField(null=True, blank=True, default=0)
+    
 
 
-class PostImage(models.Model):
+class Trazabilidad(TimeStampedModel):
+    RAZAS_CHOICES = [
+        ('angus', 'Angus'),
+        ('holstein', 'Holstein'),
+        ('charolais', 'Charolais'),
+        ('brahman', 'Brahman'),
+        ('limousin', 'Limousin'),
+        ('simmental', 'Simmental'),
+        ('hereford', 'Hereford'),
+        ('pardo_suizo', 'Pardo Suizo'),
+        ('santa_gertrudis', 'Santa Gertrudis'),
+        ('gyr', 'Gyr'),
+        ('girolando', 'Girolando'),
+        ('otro', 'Otro'),  # Opción para otras razas no listadas
+    ]
+    
+
+    post = models.ForeignKey(Post, on_delete=models.SET_NULL, null=True)
+    codigo_chapa = models.CharField(max_length = 20)
+    expediente = models.ImageField(upload_to='expedientes/', null=True, blank=True)
+    breed_M = models.CharField(max_length=20, choices=RAZAS_CHOICES, default='otro', null=True, blank=True)
+    breed_P = models.CharField(max_length=20, choices=RAZAS_CHOICES, default='otro', null=True, blank=True)
+    categoria = models.ManyToManyField(Categoria, blank=True)
+    estado_de_salud = models.TextField(null=True, blank=True)
+    vacunas = models.ManyToManyField(Vacuna, blank=True)
+    comentarios = models.TextField(null=True, blank=True)
+
+
+    def clean(self):
+        if not self.post.traceability:
+            raise ValidationError("Creando una trazabilidad para un post sin trazabilidad")
+
+class PostImage(TimeStampedModel):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to='post_images/')
 
     def __str__(self):
         return f"Image for {self.post.description[:20]}"
 
-
-class Bid(models.Model):
+class Subasta(TimeStampedModel):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='bids')
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    end_date = models.DateTimeField(null=True, blank=True)
+
+    def get_highest_bid(self):
+        """Get the highest bid placed on this post."""
+        highest_bid = self.bids.order_by('-amount').first()
+        return highest_bid.amount if highest_bid else None
+
+    def is_auction_active(self):
+        """Check if the auction is active based on the end date and current time."""
+        return self.end_date > timezone.now()
+
+    def get_final_amount(self):
+        """Get the highest bid placed on this post."""
+        if not self.is_auction_active:
+            return self.get_highest_bid
+            
+
+class Bid(TimeStampedModel):
+    subasta = models.ForeignKey(Subasta, on_delete=models.CASCADE, related_name='bids')
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Bid by {self.user.email} on {self.post.description[:20]} - Amount: {self.amount}"
 
     class Meta:
         ordering = ['-amount']
+
+    def clean(self):
+        if not self.subasta.is_auction_active():
+            raise ValidationError("No se pueden realizar pujas en una subasta cerrada o fuera de su tiempo activo.")
+            
+        puja_mayor = self.subasta.get_highest_bid
+        if puja_mayor and self.amount <= puja_mayor.amount:
+            raise ValidationError(f"El monto de la puja debe ser mayor a la puja anterior de {puja_mayor.monto}")
+
+    def save(self, *args, **kwargs):
+        # Ejecutar la validación antes de guardar
+        self.full_clean()
+        super().save(*args, **kwargs)
+
