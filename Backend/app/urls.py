@@ -17,9 +17,17 @@ urlpatterns = [
     path('contact/', ContactView.as_view(), name="contact"),
 
 
+
     # mobile
     path('user/posts/<int:user_id>/', PostsByUser.as_view(), name="user-posts"),
     path('', include(router.urls)),
+
+
+    # Stripe 
+
+    path('webhook/stripe/', views.stripe_webhook, name='stripe_webhook'),
+    path('test/<int:post_id>/<plan>/', views.promote_post, name='promote_post'),
+
 ]
 
 if settings.DEBUG:

@@ -232,3 +232,63 @@ class Bid(TimeStampedModel):
         self.full_clean()
         super().save(*args, **kwargs)
 
+
+
+import stripe
+from django.conf import settings
+from django.db import models
+from django.contrib.auth.models import User
+from django.utils import timezone
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
+class Promotion(models.Model):
+    PLAN_CHOICES = [
+        ('A', 'Plan A'),  # Ejemplo: $10.00
+        ('B', 'Plan B'),  # Ejemplo: $20.00
+        ('C', 'Plan C'),  # Ejemplo: $30.00
+    ]
+
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='promotions')
+    plan = models.CharField(max_length=1, choices=PLAN_CHOICES)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    stripe_payment_id = models.CharField(max_length=100, blank=True, null=True)
+    is_paid = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        # Asigna un monto en función del plan seleccionado
+        plan_prices = {'A': 10.00, 'B': 20.00, 'C': 30.00}
+        self.amount = plan_prices.get(self.plan, 10.00)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.post.title} - {self.is_paid}"
+
+    def create_stripe_session(self):
+        """Crear una sesión de pago de Stripe para esta promoción."""
+        try:
+            checkout_session = stripe.checkout.Session.create(
+                payment_method_types=['card'],
+                line_items=[{
+                    'price_data': {
+                        'currency': 'usd',
+                        'product_data': {
+                            'name': f'Promoción {self.get_plan_display()} para {self.post.title}',
+                        },
+                        'unit_amount': int(self.amount * 100),  # Stripe maneja los montos en centavos
+                    },
+                    'quantity': 1,
+                }],
+                mode='payment',
+                success_url=settings.YOUR_DOMAIN + '/success/',
+                cancel_url=settings.YOUR_DOMAIN + '/cancel/',
+                metadata={'promotion_id': self.id},
+            )
+            self.stripe_payment_id = checkout_session.id
+            self.save()
+            return checkout_session
+        except Exception as e:
+            print(f"Error creando la sesión de pago de Stripe: {e}")
+            return None
+

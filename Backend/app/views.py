@@ -51,6 +51,52 @@ class PostsByUser(generics.ListAPIView):
         user_id = self.kwargs['user_id']
         user = get_object_or_404(User, id=user_id)
         return Post.objects.filter(user=user)
+
+
+import stripe
+from django.http import JsonResponse, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from .models import Promotion
+from django.conf import settings
+
+@csrf_exempt
+def stripe_webhook(request):
+    payload = request.body
+    sig_header = request.headers.get('Stripe-Signature')
+    event = None
+
+    try:
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, settings.STRIPE_WEBHOOK_SECRET
+        )
+    except ValueError:
+        return HttpResponse(status=400)
+    except stripe.error.SignatureVerificationError:
+        return HttpResponse(status=400)
+
+    if event['type'] == 'checkout.session.completed':
+        session = event['data']['object']
+        promotion_id = session['metadata']['promotion_id']
+        promotion = Promotion.objects.get(id=promotion_id)
+        promotion.is_paid = True
+        promotion.save()
+
+    return JsonResponse({'status': 'success'}, status=200)
+
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.conf import settings
+from .models import Post, Promotion
+
+def promote_post(request, post_id, plan):
+    post = get_object_or_404(Post, id=post_id)
+    promotion = Promotion.objects.create(post=post, plan=plan, amount=100)
+    checkout_session = promotion.create_stripe_session()
+
+    if checkout_session:
+        return redirect(checkout_session.url)
+    else:
+        return render(request, 'error.html', {'message': 'Hubo un problema al iniciar el pago con Stripe.'})
 """
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
