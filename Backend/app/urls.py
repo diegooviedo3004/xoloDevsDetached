@@ -1,16 +1,14 @@
+from . import views
 from django.urls import path, include
-from .views import RegisterView, LoginView, UserProfileView, CreateCowView
 from rest_framework.routers import DefaultRouter
+from .views import PostViewSet, IndexView, ContactView, CreatePostView, PostCreateView
 
 router = DefaultRouter()
+router.register(r'posts', PostViewSet)
 
 urlpatterns = [
-    path('register/', RegisterView.as_view(), name='register'),
-    path('login/', LoginView.as_view(), name='login'),
-    path('profile/<int:user_id>/', UserProfileView.as_view(), name='user-profile'),
-    path('create-cow/', CreateCowView.as_view(), name='create-cow'),
-
+    path('', IndexView.as_view(), name="home"),
+    path('new/post/', PostCreateView.as_view(), name="create_post"),
+    path('contact/', ContactView.as_view(), name="contact"),
     path('', include(router.urls)),
-    # path('update-profile-picture/', ProfilePictureUpdateView.as_view(), name='update-profile-picture'),
-
 ]

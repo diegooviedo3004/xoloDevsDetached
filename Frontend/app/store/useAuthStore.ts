@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
 
-interface AuthState {r
+interface AuthState {
     isAuthenticated: boolean;
     refresh: string;
     access: string;

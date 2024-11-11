@@ -1,12 +1,18 @@
 import { View, Text,  Image, TouchableOpacity, StyleSheet, ScrollView, TextInput } from 'react-native'
-import React, { useRef, useState } from 'react'
-import { useTheme } from '@react-navigation/native';
+import React, {useEffect, useRef, useState} from 'react'
+import {useRoute, useTheme} from '@react-navigation/native';
 import { IMAGES } from '../../constants/Images';
 import { COLORS,FONTS} from '../../constants/theme';
 import { Feather } from '@expo/vector-icons';
 import { GlobalStyleSheet } from '../../constants/StyleSheet';
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../../navigation/RootStackParamList';
+import {useChatStore} from "../../store/useChatStore";
+import {useAuthStore} from "../../store/useAuthStore";
+import { useSocket } from "../../socket/SocketProvider";
+import FormattedMessageDate from "./FormmatedMessageDate";
+import messageStatus from "./MessageStatus";
+import MessageStatus from "./MessageStatus";
 
 const ChatData = [
     {
@@ -119,6 +125,10 @@ type SinglechatScreenProps = StackScreenProps<RootStackParamList, 'Singlechat'>;
 
 const Singlechat = ({navigation} : SinglechatScreenProps) => {
 
+    const { activeChat } = useChatStore();
+    const {user_id} = useAuthStore()
+    const socket = useSocket()
+
     const theme = useTheme();
     const { colors } : {colors : any} = theme;
 
@@ -127,20 +137,46 @@ const Singlechat = ({navigation} : SinglechatScreenProps) => {
     const [messageList, setMessageList] = useState(ChatData);
     const [message, setMessage] = useState("");
 
+    useEffect(() => {
+        setMessageList(activeChat.messages)
+    }, [activeChat.messages]);
+
+    useEffect(() => {
+        socket.emit("join_room", activeChat.id);
+        socket.on("room_full", (data) => {
+            console.log(data);
+        });
+        socket.on("error", (data) => {
+            console.log(data);
+        });
+
+        socket.on("new_message", (data) => {
+            setMessageList( prevMessages => [
+                ...prevMessages,
+                data
+            ])
+        })
+
+        return () => {
+            socket.emit("leave_room", activeChat.id);
+            socket.off("room_full");
+            socket.off("error")
+        }
+    }, []);
+
     const sendMessage = () => {
         if(message.length > 0){
-            setMessageList([
-                ...messageList,
-                {
-                    id: '0',
-                    title: message,
-                    time: "4.40pm",
-                    send: true,
-                },
-            ])
+
             setMessage("");
+            const data = {
+                content: message,
+                room_id: activeChat.id,
+            }
+
+            socket.emit("send_message", data);
         }
     }
+
 
     return (
        <View style={{backgroundColor:colors.background,flex:1}}>
@@ -164,7 +200,7 @@ const Singlechat = ({navigation} : SinglechatScreenProps) => {
                             source={IMAGES.small6}
                         />
                         <View>
-                            <Text style={{ ...FONTS.fontRegular, fontSize: 14, color: colors.title }}>Emily Johnson</Text>
+                            <Text style={{ ...FONTS.fontRegular, fontSize: 14, color: colors.title }}>{activeChat?.other_user}</Text>
                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
                                 <View style={{ height: 10, width: 10, borderRadius: 12, backgroundColor: COLORS.primary }}></View>
                                 <Text style={{ ...FONTS.fontRegular, fontSize: 10, color:COLORS.primary }}>Online</Text>
@@ -203,8 +239,7 @@ const Singlechat = ({navigation} : SinglechatScreenProps) => {
                                             width: '75%',
                                             marginBottom: 10,
                                         },
-                                        data.send == false
-                                            ?
+                                            data.sender !== user_id ?
                                             {
                                                 marginRight: 'auto',
                                                 alignItems: 'flex-start',
@@ -218,7 +253,7 @@ const Singlechat = ({navigation} : SinglechatScreenProps) => {
                                     >
                                         <View
                                             style={[
-                                                data.send == false
+                                                data.sender !== user_id
                                                     ?
                                                     {
                                                         backgroundColor: COLORS.primary,
@@ -238,10 +273,13 @@ const Singlechat = ({navigation} : SinglechatScreenProps) => {
 
                                             ]}
                                         >
-                                            <Text style={{ ...FONTS.fontRegular, fontSize: 12, color: data.send ? COLORS.title : COLORS.white, paddingVertical: 10, paddingHorizontal: 10 }}>{data.title}</Text>
+                                            <Text style={{ ...FONTS.fontRegular, fontSize: 12, color: data.sender === user_id ? COLORS.title : COLORS.white, paddingVertical: 10, paddingHorizontal: 10 }}>{data.content}</Text>
                                         </View>
-                                        {data.time &&
-                                            <Text style={{  ...FONTS.fontMedium,fontSize:10, color: COLORS.primary, marginTop: 5 }}>{data.time}</Text>
+                                        {data.timestamp &&
+                                            <FormattedMessageDate style={{  ...FONTS.fontMedium,fontSize:10, color: COLORS.primary, marginTop: 5 }} date={data.timestamp} />
+                                        }
+                                        {
+                                            <MessageStatus messageList={messageList} data={data} user_id={user_id} index={index} style={{ ...FONTS.fontRegular, fontSize: 11, color: colors.text }} />
                                         }
                                     </View>
                                 </View>
@@ -260,7 +298,7 @@ const Singlechat = ({navigation} : SinglechatScreenProps) => {
                             />
                         </View>
                         <TextInput
-                            placeholder='Type Something'
+                            placeholder='Mensaje'
                             placeholderTextColor={COLORS.title}
                             onChangeText={(val) => setMessage(val)}
                             value={message}

@@ -7,6 +7,9 @@ import { COLORS,FONTS } from '../../constants/theme';
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../../navigation/RootStackParamList';
 import Header from '../../layout/Header';
+import Cardstyle4 from "../../components/Card/Cardstyle4";
+import {useDispatch} from "react-redux";
+import {addTowishList} from "../../redux/reducer/wishListReducer";
 
 
 const profileData = [
@@ -46,6 +49,47 @@ const profilecartData = [
 
 ]
 
+const CardStyleData =[
+    {
+        id:"0",
+        image:IMAGES.vacasCards1,
+        title:"Guernsey",
+        price:"$1200",
+        countnumber:"765 kg",
+    },
+    {
+        id:"1",
+        image:IMAGES.cerdoCards1,
+        title:"Holstein",
+        price:"$1300",
+        countnumber:"590 kg",
+    },
+    {
+        id:"2",
+        image:IMAGES.vacasCards2,
+        title:"Landrace",
+        price:"$600",
+        countnumber:"320 kg",
+    },{
+        id:"2",
+        image:IMAGES.vacasCards2,
+        title:"Landrace",
+        price:"$600",
+        countnumber:"320 kg",
+    },{
+        id:"2",
+        image:IMAGES.vacasCards2,
+        title:"Landrace",
+        price:"$600",
+        countnumber:"320 kg",
+    },{
+        id:"2",
+        image:IMAGES.vacasCards2,
+        title:"Landrace",
+        price:"$600",
+        countnumber:"320 kg",
+    },
+]
 
 type ProfileScreenProps = StackScreenProps<RootStackParamList, 'Profile'>;
 
@@ -53,6 +97,13 @@ const Profile = ({navigation} : ProfileScreenProps) => {
 
   const theme = useTheme();
   const { colors } : {colors : any} = theme;
+
+    const dispatch = useDispatch();
+
+    const addItemToWishList = (data: any) => {
+        dispatch(addTowishList(data));
+    }
+
   return (
     <View style={{backgroundColor:colors.card,flex:1}}>
         <Header
@@ -102,48 +153,67 @@ const Profile = ({navigation} : ProfileScreenProps) => {
             </View>
             <View style={[GlobalStyleSheet.container,{padding:0}]}>
                 <View style={[GlobalStyleSheet.flex,{paddingHorizontal:30}]}>
-                    <Text style={[styles.brandsubtitle3,{fontSize: 18,color:colors.title}]}>Mas Ordenes</Text>
+                    <Text style={[styles.brandsubtitle3,{fontSize: 18,color:colors.title}]}>Publicaciones</Text>
                 </View>
-                <View style={{ marginHorizontal: -15, paddingHorizontal: 15, paddingTop: 25 }}>
-                        <ScrollView
-                            horizontal
-                            showsHorizontalScrollIndicator={false}
-                            contentContainerStyle={{ paddingHorizontal: 30 }}
-                        >
-                            <View style={[styles.profilecard]}>
-                                {profilecartData.map((data: any, index) => {
-                                    return (
-                                        <TouchableOpacity
-                                            activeOpacity={0.8}
-                                            onPress={() => navigation.navigate('ProductsDetails')}      
-                                            key={index}
-                                            style={[styles.arrivaldata,{
-                                                backgroundColor:COLORS.primary,
-                                                borderColor:'#EFEFEF',
-                                            }]}>
-                                            <View style={[GlobalStyleSheet.flexcenter,{gap:20,justifyContent:'space-around'}]}>
-                                                <Image
-                                                    style={{height:100,width:100,resizeMode:'contain',}}
-                                                    source={data.image}
-                                                />
-                                                <View>
-                                                    <Text numberOfLines={1} style={{ ...FONTS.fontMedium, fontSize: 16, color:  COLORS.card}}>{data.title}</Text>
-                                                    <View style={{flexDirection:'row',alignItems:'center',gap:10}}>
-                                                        <Text style={{ ...FONTS.fontRegular, fontSize: 14, color:COLORS.card,opacity:.5 }}>{data.subtitle}</Text>
-                                                        <Image
-                                                            style={{height:16,width:16,resizeMode:'contain',}}
-                                                            source={IMAGES.share}
-                                                        />
-                                                    </View>
-                                                </View>
-                                            </View>
-                                        </TouchableOpacity>
-                                    );
-                                })}
-                            </View>
-                        </ScrollView>
-                    </View>
+                {/*<View style={{ marginHorizontal: -15, paddingHorizontal: 15, paddingTop: 25 }}>*/}
+                {/*        <ScrollView*/}
+                {/*            horizontal*/}
+                {/*            showsHorizontalScrollIndicator={false}*/}
+                {/*            contentContainerStyle={{ paddingHorizontal: 30 }}*/}
+                {/*        >*/}
+                {/*            <View style={[styles.profilecard]}>*/}
+                {/*                {profilecartData.map((data: any, index) => {*/}
+                {/*                    return (*/}
+                {/*                        <TouchableOpacity*/}
+                {/*                            activeOpacity={0.8}*/}
+                {/*                            onPress={() => navigation.navigate('ProductsDetails')}      */}
+                {/*                            key={index}*/}
+                {/*                            style={[styles.arrivaldata,{*/}
+                {/*                                backgroundColor:COLORS.primary,*/}
+                {/*                                borderColor:'#EFEFEF',*/}
+                {/*                            }]}>*/}
+                {/*                            <View style={[GlobalStyleSheet.flexcenter,{gap:20,justifyContent:'space-around'}]}>*/}
+                {/*                                <Image*/}
+                {/*                                    style={{height:100,width:100,resizeMode:'contain',}}*/}
+                {/*                                    source={data.image}*/}
+                {/*                                />*/}
+                {/*                                <View>*/}
+                {/*                                    <Text numberOfLines={1} style={{ ...FONTS.fontMedium, fontSize: 16, color:  COLORS.card}}>{data.title}</Text>*/}
+                {/*                                    <View style={{flexDirection:'row',alignItems:'center',gap:10}}>*/}
+                {/*                                        <Text style={{ ...FONTS.fontRegular, fontSize: 14, color:COLORS.card,opacity:.5 }}>{data.subtitle}</Text>*/}
+                {/*                                        <Image*/}
+                {/*                                            style={{height:16,width:16,resizeMode:'contain',}}*/}
+                {/*                                            source={IMAGES.share}*/}
+                {/*                                        />*/}
+                {/*                                    </View>*/}
+                {/*                                </View>*/}
+                {/*                            </View>*/}
+                {/*                        </TouchableOpacity>*/}
+                {/*                    );*/}
+                {/*                })}*/}
+                {/*            </View>*/}
+                {/*        </ScrollView>*/}
+                {/*    </View>*/}
             </View>
+            <View style={[GlobalStyleSheet.container,{paddingHorizontal:30,flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between",  alignItems: "start" }]}>
+
+                {CardStyleData.map((data:any, index:any) => {
+                    return (
+                        <Cardstyle4
+                            key={index}
+                            id={data.id}
+                            image={data.image}
+                            price={data.price}
+                            countnumber={data.countnumber}
+                            title={data.title}
+                            onPress={() => navigation.navigate('ProductsDetails')}
+                            onPress5={() => addItemToWishList(data)}
+                        />
+                    );
+                })}
+
+            </View>
+
         </ScrollView>
     </View>
   )
