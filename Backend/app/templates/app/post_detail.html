@@ -39,6 +39,18 @@
                     <div class="col-xl-6">
                         <div class="product-details__content">
                             <h5 class="mb-12">{{ post.title }}</h5>
+                            {% if post.traceability %}
+                            <span class="text-main-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-patch-check-fill" viewBox="0 0 16 16">
+                                    <path d="M10.067.87a2.89 2.89 0 0 0-4.134 0l-.622.638-.89-.011a2.89 2.89 0 0 0-2.924 2.924l.01.89-.636.622a2.89 2.89 0 0 0 0 4.134l.637.622-.011.89a2.89 2.89 0 0 0 2.924 2.924l.89-.01.622.636a2.89 2.89 0 0 0 4.134 0l.622-.637.89.011a2.89 2.89 0 0 0 2.924-2.924l-.01-.89.636-.622a2.89 2.89 0 0 0 0-4.134l-.637-.622.011-.89a2.89 2.89 0 0 0-2.924-2.924l-.89.01zm.287 5.984-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7 8.793l2.646-2.647a.5.5 0 0 1 .708.708"/>
+                                  </svg>
+                            </span>
+                            
+                            <span style="font-size: 0.9rem;" >
+                                <strong>Ganado con Trazabilidad</strong>
+                            </span>
+                            {% endif %}
+
                             <div class="flex-align gap-4">
                                 <span class="text-main-600 text-md d-flex"><i class="ph-fill ph-storefront"></i></span>
                                 <span class="text-gray-500 text-xs">Por {{ post.user.get_full_name }}</span>
@@ -47,8 +59,14 @@
                                 <span class="text-main-600 text-md d-flex"><i class="ph-fill ph-map-pin-line"></i></span>
                                 <span class="text-gray-500 text-xs"> {{ post.location }}</span>
                             </div>
-
+                            
+                                
                             <span class="mt-32 pt-32 text-gray-700 border-top border-gray-100 d-block"></span>
+
+                            <p class="text-gray-700"> <strong>Raza: </strong>{{ post.breed }}</p>
+                            <p class="text-gray-700"> <strong>Sexo: </strong>{{ post.sex }}</p>
+                            <p class="text-gray-700"> <strong>Peso: </strong>{{ post.weight }} Kg</p>
+
 
                             <p class="text-gray-700">
                                 {{ post.description }}
@@ -58,12 +76,19 @@
                                 <div class="flex-align gap-8">
                                     <h4 class="mb-0">${{ post.starting_price }}</h4>
                                 </div>
-                                <a href="#" class="btn btn-main rounded-pill">Contactar por chat</a>
                             </div>
                     
                             <span class="mt-32 pt-32 text-gray-700 border-top border-gray-100 d-block"></span>
 
-                            {% if post.traceability %}
+                            <a href="#" class="btn btn-main flex-center gap-8 rounded-8 py-16">
+                                <i class="ph ph-chat text-lg"></i>
+                                Contactar por chat
+                            </a>
+                            <a href="https://api.whatsapp.com/send/?phone=505{{ post.user.phone_number }}&text=Estoy+interesado+en+tu+anuncio+en+Encuentra24%3A+https%3A%2F%2Fwww.encuentra24.com%2Fnicaragua-en%2Fcars-auto-trucks-used-car%2Fmercedes-benz-gle-400-2017%2F28953341%0A%0A&type=phone_number&app_absent=0" target="_blank" class="btn btn-outline-main flex-center gap-8 rounded-8 py-16 mt-5">
+                                <i class="ph ph-whatsapp-logo text-lg"></i>
+                                Pide más información: {{ post.user.phone_number }}
+                            </a>
+
                             <div class="mt-32">
                                 <h6 class="fw-bold text-gray-900">Información de Trazabilidad</h6>
                                 <ul class="text-gray-700">
@@ -72,7 +97,7 @@
                                     <li>Última vacuna: 20/05/2023</li>
                                 </ul>
                             </div>
-                            {% endif %}
+                            
                         </div>
                     </div>
                 </div>
@@ -142,48 +167,48 @@
 <!-- ========================== Similar Product End ============================= -->
     
     <!-- ========================== Shipping Section Start ============================ -->
-    <section class="shipping mb-24" id="shipping">
-        <div class="container container-lg">
-            <div class="row gy-4">
-                <div class="col-xxl-3 col-sm-6" data-aos="zoom-in" data-aos-duration="400">
-                    <div class="shipping-item flex-align gap-16 rounded-16 bg-main-50 hover-bg-main-100 transition-2">
-                        <span class="w-56 h-56 flex-center rounded-circle bg-main-600 text-white text-32 flex-shrink-0"><i class="ph-fill ph-thumbs-up"></i></span>
-                        <div class="">
-                            <h6 class="mb-0">Calidad Garantizada</h6>
-                            <span class="text-sm text-heading">Solo el mejor ganado para nuestros clientes</span>
-                        </div>
+ <section class="shipping mb-24" id="shipping">
+    <div class="container container-lg">
+        <div class="row gy-4">
+            <div class="col-xxl-3 col-sm-6" data-aos="zoom-in" data-aos-duration="400">
+                <div class="shipping-item flex-align gap-16 rounded-16 bg-main-50 hover-bg-main-100 transition-2">
+                    <span class="w-56 h-56 flex-center rounded-circle bg-main-600 text-white text-32 flex-shrink-0"><i class="ph-fill ph-car-profile"></i></span>
+                    <div class="">
+                        <h6 class="mb-0">Free Shipping</h6>
+                        <span class="text-sm text-heading">Free shipping all over the US</span>
                     </div>
                 </div>
-                <div class="col-xxl-3 col-sm-6" data-aos="zoom-in" data-aos-duration="600">
-                    <div class="shipping-item flex-align gap-16 rounded-16 bg-main-50 hover-bg-main-100 transition-2">
-                        <span class="w-56 h-56 flex-center rounded-circle bg-main-600 text-white text-32 flex-shrink-0"><i class="ph-fill ph-handshake"></i></span>
-                        <div class="">
-                            <h6 class="mb-0">Confianza y Seguridad</h6>
-                            <span class="text-sm text-heading">Conexiones directas entre compradores y vendedores</span>
-                        </div>
+            </div>
+            <div class="col-xxl-3 col-sm-6" data-aos="zoom-in" data-aos-duration="600">
+                <div class="shipping-item flex-align gap-16 rounded-16 bg-main-50 hover-bg-main-100 transition-2">
+                    <span class="w-56 h-56 flex-center rounded-circle bg-main-600 text-white text-32 flex-shrink-0"><i class="ph-fill ph-hand-heart"></i></span>
+                    <div class="">
+                        <h6 class="mb-0"> 100% Satisfaction</h6>
+                        <span class="text-sm text-heading">Free shipping all over the US</span>
                     </div>
                 </div>
-                <div class="col-xxl-3 col-sm-6" data-aos="zoom-in" data-aos-duration="800">
-                    <div class="shipping-item flex-align gap-16 rounded-16 bg-main-50 hover-bg-main-100 transition-2">
-                        <span class="w-56 h-56 flex-center rounded-circle bg-main-600 text-white text-32 flex-shrink-0"><i class="ph-fill ph-seal-check"></i></span>
-                        <div class="">
-                            <h6 class="mb-0">Lotes Certificados</h6>
-                            <span class="text-sm text-heading">Seleccionados por su salud y genética</span>
-                        </div>
+            </div>
+            <div class="col-xxl-3 col-sm-6" data-aos="zoom-in" data-aos-duration="800">
+                <div class="shipping-item flex-align gap-16 rounded-16 bg-main-50 hover-bg-main-100 transition-2">
+                    <span class="w-56 h-56 flex-center rounded-circle bg-main-600 text-white text-32 flex-shrink-0"><i class="ph-fill ph-credit-card"></i></span>
+                    <div class="">
+                        <h6 class="mb-0"> Secure Payments</h6>
+                        <span class="text-sm text-heading">Free shipping all over the US</span>
                     </div>
                 </div>
-                <div class="col-xxl-3 col-sm-6" data-aos="zoom-in" data-aos-duration="1000">
-                    <div class="shipping-item flex-align gap-16 rounded-16 bg-main-50 hover-bg-main-100 transition-2">
-                        <span class="w-56 h-56 flex-center rounded-circle bg-main-600 text-white text-32 flex-shrink-0"><i class="ph-fill ph-headset"></i></span>
-                        <div class="">
-                            <h6 class="mb-0">Soporte 24/7</h6>
-                            <span class="text-sm text-heading">Atención continua para tus necesidades</span>
-                        </div>
+            </div>
+            <div class="col-xxl-3 col-sm-6" data-aos="zoom-in" data-aos-duration="1000">
+                <div class="shipping-item flex-align gap-16 rounded-16 bg-main-50 hover-bg-main-100 transition-2">
+                    <span class="w-56 h-56 flex-center rounded-circle bg-main-600 text-white text-32 flex-shrink-0"><i class="ph-fill ph-chats"></i></span>
+                    <div class="">
+                        <h6 class="mb-0"> 24/7 Support</h6>
+                        <span class="text-sm text-heading">Free shipping all over the US</span>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+ </section>
 <!-- ========================== Shipping Section End ============================ -->
 
 {% endblock content %}
