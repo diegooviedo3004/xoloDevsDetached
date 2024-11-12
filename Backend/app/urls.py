@@ -1,7 +1,7 @@
 from . import views
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import PostViewSet, IndexView, ContactView, CreatePostView, PostsByUser
+from .views import PostViewSet, IndexView, ContactView, CreatePostView, PostsByUser, PostDetailView
 from .views import PostTraceabilityView
 from django.conf import settings
 from django.conf.urls.static import static
@@ -15,6 +15,7 @@ urlpatterns = [
     path('new/post/', PostTraceabilityView.as_view(), name="create_post"),
     # path('post/<int:pk>/', PostDetailView.as_view(), name='post_detail'),
     path('contact/', ContactView.as_view(), name="contact"),
+    path('post/<int:pk>/', PostDetailView.as_view(), name='post_detail'),
 
 
 
