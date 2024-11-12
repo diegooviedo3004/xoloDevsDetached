@@ -9891,7 +9891,7 @@ input:focus-visible {
 /* ================================= Testimonials Section Css End ==================================== */
 /* ============================ Product Details Css Start ============================= */
 .product-details__thumb-slider {
-    padding: clamp(3rem, -2.173rem + 10.777vw, 7.25rem);
+    padding: clamp(0.5rem, 0.25rem + 2vw, 1.5rem) !important;
 }
 
 .product-details .slick-initialized.slick-slider .slick-slide > div > div {
