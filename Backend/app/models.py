@@ -196,9 +196,9 @@ class Traceability(TimeStampedModel):
     comments = models.TextField(null=True, blank=True)
 
 
-    # def clean(self):
-    #     if not self.post.traceability:
-    #         raise ValidationError("Creando una trazabilidad para un post sin trazabilidad")
+    def clean(self):
+        if not self.post.traceability:
+            raise ValidationError("Creando una trazabilidad para un post sin trazabilidad")
         
     def __str__(self):
         return f"Trazabilidad {self.chapa_code}"

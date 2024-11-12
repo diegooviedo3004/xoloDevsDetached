@@ -1,13 +1,14 @@
 from . import views
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import PostViewSet, IndexView, ContactView, CreatePostView, PostsByUser
+from .views import PostViewSet, IndexView, ContactView
 from .views import PostTraceabilityView
 from django.conf import settings
 from django.conf.urls.static import static
 
 router = DefaultRouter()
-router.register(r'posts', PostViewSet)
+router.register(r'posts', PostViewSet, basename='post')
+
 
 urlpatterns = [
     # web
@@ -19,7 +20,6 @@ urlpatterns = [
 
 
     # mobile
-    path('user/posts/<int:user_id>/', PostsByUser.as_view(), name="user-posts"),
     path('', include(router.urls)),
 
 
