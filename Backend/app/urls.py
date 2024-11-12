@@ -1,8 +1,8 @@
 from . import views
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import PostViewSet, IndexView, ContactView, CreatePostView, PostsByUser, PostDetailView
-#from .views import PostCreateView
+from .views import PostViewSet, IndexView, ContactView, CreatePostView, PostsByUser
+from .views import PostTraceabilityView
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -11,9 +11,9 @@ router.register(r'posts', PostViewSet)
 
 urlpatterns = [
     # web
-    path('', IndexView.as_view(), name="home"),
-    #path('new/post/', PostCreateView.as_view(), name="create_post"),
-    path('post/<int:pk>/', PostDetailView.as_view(), name='post_detail'),
+    path('', IndexView.as_view(), name="index"),
+    path('new/post/', PostTraceabilityView.as_view(), name="create_post"),
+    # path('post/<int:pk>/', PostDetailView.as_view(), name='post_detail'),
     path('contact/', ContactView.as_view(), name="contact"),
 
 

@@ -5,7 +5,29 @@ from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from decimal import Decimal
+from django.core.exceptions import ValidationError
+from django.conf import settings
+from django.db import models
+from django.contrib.auth.models import User
+from django.utils import timezone
 
+import stripe
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
+BREED_CHOICES = [
+    ('Angus', 'Angus'),
+    ('Holstein', 'Holstein'),
+    ('Charolais', 'Charolais'),
+    ('Brahman', 'Brahman'),
+    ('Limousin', 'Limousin'),
+    ('Simmental', 'Simmental'),
+    ('Hereford', 'Hereford'),
+    ('Pardo suizo', 'Pardo Suizo'),
+    ('Santa gertrudis', 'Santa Gertrudis'),
+    ('Gyr', 'Gyr'),
+    ('Girolando', 'Girolando'),
+    ('Others', 'Otros'),
+]
 
 class TimeStampedModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -87,25 +109,10 @@ class Post(TimeStampedModel):
     title = models.CharField(max_length=100)
     description = models.TextField()
     sex = models.CharField(max_length=10, choices=SEX_CHOICES)
-
-    RAZAS_CHOICES = [
-        ('angus', 'Angus'),
-        ('holstein', 'Holstein'),
-        ('charolais', 'Charolais'),
-        ('brahman', 'Brahman'),
-        ('limousin', 'Limousin'),
-        ('simmental', 'Simmental'),
-        ('hereford', 'Hereford'),
-        ('pardo_suizo', 'Pardo Suizo'),
-        ('santa_gertrudis', 'Santa Gertrudis'),
-        ('gyr', 'Gyr'),
-        ('girolando', 'Girolando'),
-        ('otro', 'Otro'),  # Opción para otras razas no listadas
-    ]
     
-    breed = models.CharField(max_length=20, choices=RAZAS_CHOICES, default='otro')
+    breed = models.CharField(max_length=20, choices=BREED_CHOICES, default='Others')
     
-    location = models.CharField(max_length=100)
+    location = models.CharField(max_length=300)
 
     lat = models.TextField()
     long = models.TextField()
@@ -116,72 +123,89 @@ class Post(TimeStampedModel):
     lot = models.BooleanField(default=False, blank=True)
     post_type = models.CharField(choices=POST_CHOICES, max_length=50, default='Post')
     video_url = models.URLField(blank=True, null=True)
-    approved = models.BooleanField(default=False) # Si ya lo aprobamos manualmente
-    is_active = models.BooleanField(default=True) #Soft delete 
+    is_approved = models.BooleanField(default=False) 
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.description[:20]} - {self.type}"
+        return f"{self.description[:20]} - {self.post_type}"
 
-    
-   
+    class Meta:
+        verbose_name = _('anuncio')
+        verbose_name_plural = _('anuncios')
 
-  
-
-class Categoria(TimeStampedModel):
+class Category(TimeStampedModel):
     name = models.CharField(max_length = 100)
-    descripcion = models.TextField(null = True, blank = True)
+    description = models.TextField(null = True, blank = True)
 
-class Vacuna(TimeStampedModel):
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = _('categoría')
+        verbose_name_plural = _('categorías')
+
+class Vaccine(TimeStampedModel):
     name = models.CharField(max_length = 100)
-
-class InfoReproductiva(TimeStampedModel):
-    trazabilidad = models.ForeignKey('Trazabilidad', models.SET_NULL, null=True)
-    fecha_de_nacimiento = models.DateField(null=True, blank=True)
-    ultimo_parto = models.DateField(null=True, blank=True)
-    fecha_de_prenez = models.DateField(null=True, blank=True)
-    fecha_de_ultimo_celo = models.DateField(null=True, blank=True)
-    dias_de_prenez = models.IntegerField(null=True, blank=True, default=0)
-    fecha_esperada_parto = models.DateField(null=True, blank=True)
-    produccion_leche_litros = models.IntegerField(null=True, blank=True, default=0)
-
-class InfoLechera(TimeStampedModel):
-    trazabilidad = models.ForeignKey('Trazabilidad', models.SET_NULL, null=True)
-    produccion_diaria_litros = models.IntegerField(null=True, blank=True, default=0)
-    dias_de_lactancia = models.IntegerField(null=True, blank=True, default=0)
     
+    def __str__(self):
+        return self.name
 
+    class Meta:
+        verbose_name = _('vacuna')
+        verbose_name_plural = _('vacunas')
 
-class Trazabilidad(TimeStampedModel):
-    RAZAS_CHOICES = [
-        ('angus', 'Angus'),
-        ('holstein', 'Holstein'),
-        ('charolais', 'Charolais'),
-        ('brahman', 'Brahman'),
-        ('limousin', 'Limousin'),
-        ('simmental', 'Simmental'),
-        ('hereford', 'Hereford'),
-        ('pardo_suizo', 'Pardo Suizo'),
-        ('santa_gertrudis', 'Santa Gertrudis'),
-        ('gyr', 'Gyr'),
-        ('girolando', 'Girolando'),
-        ('otro', 'Otro'),  # Opción para otras razas no listadas
-    ]
+class ReproductiveData(TimeStampedModel):
+    traceability = models.ForeignKey('Traceability', models.SET_NULL, null=True)
+    birth_date = models.DateField(null=True, blank=True)
+    last_calving = models.DateField(null=True, blank=True)
+    beeding_date = models.DateField(null=True, blank=True)
+    last_heat_date = models.DateField(null=True, blank=True)
+    days_pregnant = models.IntegerField(null=True, blank=True, default=0)
+    expected_calving_date = models.DateField(null=True, blank=True)
+    milk_production_in_liters = models.IntegerField(null=True, blank=True, default=0)
+
+    def __str__(self):
+        return f"Datos reproductivos - {self.traceability}"
+
+    class Meta:
+        verbose_name = _('dato reproductivo')
+        verbose_name_plural = _('datos reproductivos')
+
+class DairyCowData(TimeStampedModel):
+    traceability = models.ForeignKey('Traceability', models.SET_NULL, null=True)
+    daily_milk_production_in_liters = models.IntegerField(null=True, blank=True, default=0)
+    days_in_milk = models.IntegerField(null=True, blank=True, default=0)
     
+    def __str__(self):
+        return f"Producción diaria: {self.daily_milk_production_in_liters}L"
 
-    post = models.ForeignKey(Post, on_delete=models.SET_NULL, null=True)
-    codigo_chapa = models.CharField(max_length = 20)
-    expediente = models.ImageField(upload_to='expedientes/', null=True, blank=True)
-    breed_M = models.CharField(max_length=20, choices=RAZAS_CHOICES, default='otro', null=True, blank=True)
-    breed_P = models.CharField(max_length=20, choices=RAZAS_CHOICES, default='otro', null=True, blank=True)
-    categoria = models.ManyToManyField(Categoria, blank=True)
-    estado_de_salud = models.TextField(null=True, blank=True)
-    vacunas = models.ManyToManyField(Vacuna, blank=True)
-    comentarios = models.TextField(null=True, blank=True)
+    class Meta:
+        verbose_name = _('dato de vaca lechera')
+        verbose_name_plural = _('datos de vacas lecheras')
+
+class Traceability(TimeStampedModel):
+    
+    post = models.ForeignKey(Post, on_delete=models.SET_NULL, null=True, related_name="traceabilities")
+    chapa_code = models.CharField(max_length = 20)
+    record = models.ImageField(upload_to='record/', null=True, blank=True)
+    breed_M = models.CharField(max_length=20, choices=BREED_CHOICES, default='Others', null=True, blank=True)
+    breed_P = models.CharField(max_length=20, choices=BREED_CHOICES, default='Others', null=True, blank=True)
+    category = models.ManyToManyField(Category, blank=True)
+    health_status = models.TextField(null=True, blank=True)
+    vaccines = models.ManyToManyField(Vaccine, blank=True)
+    comments = models.TextField(null=True, blank=True)
 
 
-    def clean(self):
-        if not self.post.traceability:
-            raise ValidationError("Creando una trazabilidad para un post sin trazabilidad")
+    # def clean(self):
+    #     if not self.post.traceability:
+    #         raise ValidationError("Creando una trazabilidad para un post sin trazabilidad")
+        
+    def __str__(self):
+        return f"Trazabilidad {self.chapa_code}"
+
+    class Meta:
+        verbose_name = _('trazabilidad')
+        verbose_name_plural = _('trazabilidades')
 
 class PostImage(TimeStampedModel):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='images')
@@ -189,8 +213,12 @@ class PostImage(TimeStampedModel):
 
     def __str__(self):
         return f"Image for {self.post.description[:20]}"
+    
+    class Meta:
+        verbose_name = _('imagen del post')
+        verbose_name_plural = _('imagenes del post')
 
-class Subasta(TimeStampedModel):
+class Auction(TimeStampedModel):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='bids')
     end_date = models.DateTimeField(null=True, blank=True)
 
@@ -208,9 +236,15 @@ class Subasta(TimeStampedModel):
         if not self.is_auction_active:
             return self.get_highest_bid
             
+    def __str__(self):
+        return f"Subasta para {self.post.title}"
+
+    class Meta:
+        verbose_name = _('subasta')
+        verbose_name_plural = _('subastas')
 
 class Bid(TimeStampedModel):
-    subasta = models.ForeignKey(Subasta, on_delete=models.CASCADE, related_name='bids')
+    auction = models.ForeignKey(Auction, on_delete=models.CASCADE, related_name='bids')
     amount = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
@@ -218,35 +252,27 @@ class Bid(TimeStampedModel):
 
     class Meta:
         ordering = ['-amount']
+        verbose_name = _('oferta')
+        verbose_name_plural = _('ofertas')
 
     def clean(self):
         if not self.subasta.is_auction_active():
             raise ValidationError("No se pueden realizar pujas en una subasta cerrada o fuera de su tiempo activo.")
             
-        puja_mayor = self.subasta.get_highest_bid
-        if puja_mayor and self.amount <= puja_mayor.amount:
-            raise ValidationError(f"El monto de la puja debe ser mayor a la puja anterior de {puja_mayor.monto}")
+        highest_bid = self.subasta.get_highest_bid
+        if highest_bid and self.amount <= highest_bid.amount:
+            raise ValidationError(f"El monto de la puja debe ser mayor a la puja anterior de {highest_bid.amount}")
 
     def save(self, *args, **kwargs):
         # Ejecutar la validación antes de guardar
         self.full_clean()
         super().save(*args, **kwargs)
 
-
-
-import stripe
-from django.conf import settings
-from django.db import models
-from django.contrib.auth.models import User
-from django.utils import timezone
-
-stripe.api_key = settings.STRIPE_SECRET_KEY
-
 class Promotion(models.Model):
     PLAN_CHOICES = [
-        ('A', 'Plan A'),  # Ejemplo: $10.00
-        ('B', 'Plan B'),  # Ejemplo: $20.00
-        ('C', 'Plan C'),  # Ejemplo: $30.00
+        ('A', 'Plan A'), 
+        ('B', 'Plan B'), 
+        ('C', 'Plan C'),
     ]
 
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='promotions')
