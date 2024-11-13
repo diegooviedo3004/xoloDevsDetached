@@ -176,7 +176,7 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=300),
     'REFRESH_TOKEN_LIFETIME': timedelta(minutes=360),
 }
-LOGIN_REDIRECT_URL = 'home'
+LOGIN_REDIRECT_URL = 'index'
 LOGOUT_REDIRECT_URL = 'login'
 
 # Image
@@ -187,3 +187,10 @@ CLOUDINARY_STORAGE = {
      'API_KEY': '294527718744669', 
      'API_SECRET': 'ZZE29WW763hftb2Oiq7QmeFvCQg' 
  }
+
+# Stripe config
+STRIPE_PUBLIC_KEY = 'pk_test_51PmW05JoUYETlvDKZ9u2EMV0iScal7McWRWBREDf2GF4tHT9wbLNbmuVRR2eYVMORF1saG9ffDcjqh9qtGEEgm0T0095jlaGUr'
+STRIPE_SECRET_KEY = "sk_test_51PmW05JoUYETlvDKpi1ZzjdW2otQamzn5JmoU3Go3uULAhUuiNm9j2VJWMJHk0nvzm8ha5csJZ7A6uioHevj7ZFL00ZvZK1dyi"
+STRIPE_WEBHOOK_SECRET = 'whsec_06RDW5GNkINGbOleSQnKt16C5xC3Ak0i'
+
+YOUR_DOMAIN = 'https://tshkvfbp-8000.use2.devtunnels.ms'

@@ -34,6 +34,9 @@ daphne = "*"
 django-cors-headers = "*"
 channels = "*"
 django-widget-tweaks = "*"
+cloudinary = "*"
+django-cloudinary-storage = "*"
+stripe = "*"
 
 [dev-packages]
 

@@ -15,7 +15,7 @@
 
     .leaflet-control-container{z-index: 50;}
     #autocomplete-list{z-index: 1001;}
-  </style>  
+</style>  
 
 <main class="d-flex align-items-center" style="margin-top: 2rem; margin-bottom: 10rem;">
     <div class="container">
@@ -23,67 +23,47 @@
             {% csrf_token %}
             <div id="wizard">
                 
-                {% if form.non_field_errors %}
+                {% if post_form.non_field_errors %}
                     <div class="alert alert-danger">
-                        {% for error in form.non_field_errors %}
+                        {% for error in post_form.errors %}
                             <p>{{ error }}</p>
                         {% endfor %}
                     </div>
                 {% endif %}
                 
-
-                    
-
-              <!-- Paso 1: Información Básica del Animal -->
-              <h3 class="mt-5">Información Básica de la publicación</h3>
-              <section>
+                {% if traceability_form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in traceability_form.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <!-- Paso 1: Información Básica del Post -->
+                <h3 class="mt-5">Información Básica de la publicación</h3>
+                <section>
                     <h5 class="bd-wizard-step-title mb-0">Paso 1</h5>
                     <h2 class="section-heading">Información Básica de la publicación</h2>
                     <div class="container">
                         
                         <div class="form-group" style="width: 100%; margin-top: 10px;">
-                            <label for="descripcion">Tipo de publicación</label>
-                            {% render_field form.type class="form-control" %}
-                            {% if form.type.errors %}
+                            <label for="type">Tipo de publicación</label>
+                            {% render_field post_form.post_type class="common-input" %}
+                            {% if post_form.post_type.errors %}
                                 <div class="">
-                                    {% for error in form.type.errors %}
+                                    {% for error in post_form.post_type.errors %}
                                         <p style="color: red;">{{ error }}</p>
                                     {% endfor %}
                                 </div>
                             {% endif %}
                         </div>
 
-                        <div class="form-group" style="width: 100%; margin-top: 10px;">
-                            <label for="descripcion">Título</label>
-                            {% render_field form.title class="form-control" %}
-                            {% if form.title.errors %}
-                                <div class="">
-                                    {% for error in form.title.errors %}
-                                        <p style="color: red;">{{ error }}</p>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                            
-                        </div>
-                    
-                        <div class="form-group" style="width: 100%; margin-top: 10px;">
-                            <label for="descripcion">Descripción</label>
-                            {% render_field form.description class="form-control" %}
-                            {% if form.description.errors %}
-                                <div class="">
-                                    {% for error in form.description.errors %}
-                                        <p style="color: red;">{{ error }}</p>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-                    
                         <div class="form-group" style="width: 100%; margin-top: 10px;">
                             <label for="descripcion">Fecha final de subasta</label>
-                            {% render_field form.end_date class="form-control" required=False %}
-                            {% if form.end_date.errors %}
+                            {% render_field post_form.end_date class="common-input" required=False %}
+                            {% if post_form.end_date.errors %}
                                 <div class="">
-                                    {% for error in form.end_date.errors %}
+                                    {% for error in post_form.end_date.errors %}
                                         <p style="color: red;">{{ error }}</p>
                                     {% endfor %}
                                 </div>
@@ -91,13 +71,36 @@
                         </div>
 
                         <div class="form-group" style="width: 100%; margin-top: 10px;">
-                            <label for="descripcion">Ubicación</label>
+                            <label for="title">Título</label>
+                            {% render_field post_form.title class="common-input" %}
+                            {% if post_form.title.errors %}
+                                <div class="">
+                                    {% for error in post_form.title.errors %}
+                                        <p style="color: red;">{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    
+                        <div class="form-group" style="width: 100%; margin-top: 10px;">
+                            <label for="description">Descripción</label>
+                            {% render_field post_form.description class="common-input" %}
+                            {% if post_form.description.errors %}
+                                <div class="">
+                                    {% for error in post_form.description.errors %}
+                                        <p style="color: red;">{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group" style="width: 100%; margin-top: 10px;">
+                            <label for="location">Ubicación</label>
                             <div id="autocomplete-container">
-                            
-                                {% render_field form.location class="form-control" placeholder="Escribe una ubicación..." onkeyup="searchLocation()" %}
-                                {% if form.location.errors %}
+                                {% render_field post_form.location class="common-input" placeholder="Escribe una ubicación..." onkeyup="searchLocation()" %}
+                                {% if post_form.location.errors %}
                                     <div class="">
-                                        {% for error in form.location.errors %}
+                                        {% for error in post_form.location.errors %}
                                             <p style="color: red;">{{ error }}</p>
                                         {% endfor %}
                                     </div>
@@ -106,103 +109,341 @@
                             </div>
                             <div id="map"></div>
                         </div>
-                    
 
-                        
+                        <div class="form-group" style="width: 100%; margin-top: 10px;">
+                            <label for="description">¿Incluye trazabilidad?</label>
+                            {{ post_form.traceability }}
+                            {% if post_form.traceability.errors %}
+                                <div class="">
+                                    {% for error in post_form.traceability.errors %}
+                                        <p style="color: red;">{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="mt-5" id="traceability-section" style="display: none;">
+                        <!-- Paso 5: Información de Trazabilidad -->
+                        <section>
+                            <h2 class="section-heading my-5">Información de Trazabilidad</h2>
+                            <div class="form-group">
+                                <label for="starting_price">Código chapa</label>
+                                {% render_field traceability_form.chapa_code class="common-input" %}
+                                {% if traceability_form.chapa_code.errors %}
+                                    <div class="">
+                                        {% for error in traceability_form.chapa_code.errors %}
+                                            <p style="color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+    
+                            <div class="form-group">
+                                <label for="weight">Expediente</label>
+                                {% render_field traceability_form.record class="common-input" %}
+                                {% if traceability_form.record.errors %}
+                                    <div class="">
+                                        {% for error in traceability_form.record.errors %}
+                                            <p style="color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+    
+                            <div class="form-group">
+                                <label for="weight">Raza Materna (opcional)</label>
+                                {% render_field traceability_form.breed_M class="common-input" %}
+                                {% if traceability_form.breed_M.errors %}
+                                    <div class="">
+                                        {% for error in traceability_form.breed_M.errors %}
+                                            <p style="color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+    
+                            <div class="form-group">
+                                <label for="weight">Raza Paterna (opcional)</label>
+                                {% render_field traceability_form.breed_P class="common-input" %}
+                                {% if traceability_form.breed_P.errors %}
+                                    <div class="">
+                                        {% for error in traceability_form.breed_P.errors %}
+                                            <p style="color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+    
+                            <div class="form-group">
+                                <label for="weight">Categoría</label>
+                                {% render_field traceability_form.category class="common-input" %}
+                                {% if traceability_form.category.errors %}
+                                    <div class="">
+                                        {% for error in traceability_form.category.errors %}
+                                            <p style="color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="weight">Estado de salud</label>
+                                {% render_field traceability_form.health_status class="common-input" %}
+                                {% if traceability_form.health_status.errors %}
+                                    <div class="">
+                                        {% for error in traceability_form.health_status.errors %}
+                                            <p style="color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="weight">Vacunas</label>
+                                {% render_field traceability_form.vaccines class="common-input" %}
+                                {% if traceability_form.vaccines.errors %}
+                                    <div class="">
+                                        {% for error in traceability_form.vaccines.errors %}
+                                            <p style="color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            
+                            <div class="form-group">
+                                <label for="weight">Comentarios</label>
+                                {% render_field traceability_form.comments class="common-input" %}
+                                {% if traceability_form.comments.errors %}
+                                    <div class="">
+                                        {% for error in traceability_form.comments.errors %}
+                                            <p style="color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                        </section>
+    
+                        <!-- Paso 6: Información Reproductiva -->
+                        <section>
+                            <h2 class="section-heading my-5">Información Reproductiva</h2>
+                            <div class="form-group">
+                                <label for="starting_price">Fecha de nacimiento</label>
+                                {% render_field reproductive_data_form.birth_date class="common-input" %}
+                                {% if reproductive_data_form.birth_date.errors %}
+                                    <div class="">
+                                        {% for error in reproductive_data_form.birth_date.errors %}
+                                            <p style="color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+    
+                            <div class="form-group">
+                                <label for="starting_price">Último parto</label>
+                                {% render_field reproductive_data_form.last_calving class="common-input" %}
+                                {% if reproductive_data_form.last_calving.errors %}
+                                    <div class="">
+                                        {% for error in reproductive_data_form.last_calving.errors %}
+                                            <p style="color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+    
+                            <div class="form-group">
+                                <label for="weight">Fecha de preñez</label>
+                                {% render_field reproductive_data_form.beeding_date class="common-input" %}
+                                {% if reproductive_data_form.beeding_date.errors %}
+                                    <div class="">
+                                        {% for error in reproductive_data_form.beeding_date.errors %}
+                                            <p style="color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+    
+                            <div class="form-group">
+                                <label for="weight">Fecha de último celo</label>
+                                {% render_field reproductive_data_form.last_heat_date class="common-input" %}
+                                {% if reproductive_data_form.last_heat_date.errors %}
+                                    <div class="">
+                                        {% for error in reproductive_data_form.last_heat_date.errors %}
+                                            <p style="color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+    
+                            <div class="form-group">
+                                <label for="weight">Días de preñez</label>
+                                {% render_field reproductive_data_form.days_pregnant class="common-input" %}
+                                {% if reproductive_data_form.days_pregnant.errors %}
+                                    <div class="">
+                                        {% for error in reproductive_data_form.days_pregnant.errors %}
+                                            <p style="color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+    
+                            <div class="form-group">
+                                <label for="weight">Fecha esperada de parto</label>
+                                {% render_field reproductive_data_form.expected_calving_date class="common-input" %}
+                                {% if reproductive_data_form.expected_calving_date.errors %}
+                                    <div class="">
+                                        {% for error in reproductive_data_form.expected_calving_date.errors %}
+                                            <p style="color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="weight">Producción de leche por litros</label>
+                                {% render_field reproductive_data_form.milk_production_in_liters class="common-input" %}
+                                {% if reproductive_data_form.milk_production_in_liters.errors %}
+                                    <div class="">
+                                        {% for error in reproductive_data_form.milk_production_in_liters.errors %}
+                                            <p style="color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                        </section>
+    
+                        <!-- Paso 7: Información de vaca lechera -->
+                        <section>
+                            <h2 class="section-heading my-5">Información de vaca lechera</h2>
+                            
+                            <div class="form-group">
+                                <label for="starting_price">Producción diaria de leche en litros</label>
+                                {% render_field dairy_cow_form.daily_milk_production_in_liters class="common-input" %}
+                                {% if dairy_cow_form.daily_milk_production_in_liters.errors %}
+                                    <div class="">
+                                        {% for error in dairy_cow_form.daily_milk_production_in_liters.errors %}
+                                            <p style="color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="starting_price">Días de lactancia</label>
+                                {% render_field dairy_cow_form.days_in_milk class="common-input" %}
+                                {% if dairy_cow_form.days_in_milk.errors %}
+                                    <div class="">
+                                        {% for error in dairy_cow_form.days_in_milk.errors %}
+                                            <p style="color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                        </section>
                     </div>
                 </section>
 
-
-              <h3>Información Básica del Animal</h3>
-              <section>
-                  <h5 class="bd-wizard-step-title">Paso 2</h5>
-                  <h2 class="section-heading">Información Básica del Animal</h2>
-                  <div class="container">
-                    <div style="display: flex; gap: 10px;">
-                        <div class="form-group" style="flex: 1;">
-                            <label for="sexo">Sexo</label>
-                            {% render_field form.sex class="form-control" required=True %}
-                            {% if form.sex.errors %}
-                                <div class="">
-                                    {% for error in form.sex.errors %}
-                                        <p style="color: red;">{{ error }}</p>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-                        <div class="form-group" style="flex: 1;">
-                            <label for="raza">Raza</label>
-                            {% render_field form.breed class="form-control" %}
-                            {% if form.breed.errors %}
-                                <div class="">
-                                    {% for error in form.breed.errors %}
-                                        <p style="color: red;">{{ error }}</p>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
+                <!-- Paso 2: Información Básica del Animal -->
+                <h3>Información Básica del Animal</h3>
+                <section>
+                    <h5 class="bd-wizard-step-title">Paso 2</h5>
+                    <h2 class="section-heading">Información Básica del Animal</h2>
+                    <div class="container">
+                        <div style="display: flex; gap: 10px;">
+                            <div class="form-group" style="flex: 1;">
+                                <label for="sex">Sexo</label>
+                                {% render_field post_form.sex class="common-input" required=True %}
+                                {% if post_form.sex.errors %}
+                                    <div class="">
+                                        {% for error in post_form.sex.errors %}
+                                            <p style="color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label for="breed">Raza</label>
+                                {% render_field post_form.breed class="common-input" required=True %}
+                                {% if post_form.breed.errors %}
+                                    <div class="">
+                                        {% for error in post_form.breed.errors %}
+                                            <p style="color: red;">{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
-                
+                </section>
+
+                <!-- Paso 3: Imágenes y Videos -->
+                <h3>Imágenes y Videos</h3>
+                <section>
+                    <h5 class="bd-wizard-step-title">Paso 3</h5>
+                    <h2 class="section-heading">Imágenes y Videos</h2>
                     
-                </div>
-              </section>
+                    <div class="form-group">
+                        <label>Subir Imágenes</label>
+                        <input type="file" name="images" id="images" multiple class="common-input" accept="image/*" onchange="validateFileCount(this)" required>
+                        <small class="text-danger mb-5" id="file-error" style="display: none;">Solo puedes subir un máximo de 9 imágenes.</small>
+                        {% if post_form.images.errors %}
+                        <div class="">
+                            {% for error in post_form.images.errors %}
+                                <p style="color: red;">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    </div>
 
-              <!-- Paso 2: Imágenes y Videos -->
-              <h3>Imágenes y Videos</h3>
-              <section>
-                <h5 class="bd-wizard-step-title">Paso 3</h5>
-                <h2 class="section-heading">Imágenes y Videos</h2>
+                    <div class="form-group">
+                        <label for="video_url">Enlace de Video (YouTube)</label>
+                        {% render_field post_form.video_url class="common-input" %}
+                        {% if post_form.video_url.errors %}
+                            <div class="">
+                                {% for error in post_form.video_url.errors %}
+                                    <p style="color: red;">{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </section>
                 
-                <!-- Campos para múltiples imágenes -->
-                <div class="form-group">
-                    <label>Subir Imágenes</label>
-                    <input type="file" name="images" id="images" multiple class="form-control" accept="image/*" onchange="validateFileCount(this)">
-                    <small class="text-danger mb-5" id="file-error" style="display: none;">Solo puedes subir un máximo de 9 imágenes.</small>                    
-                </div>
+                <!-- Paso 4: Información Adicional de Venta -->
+                <h3>Información Adicional de Venta</h3>
+                <section class="mb-5">
+                    <h5 class="bd-wizard-step-title">Paso 4</h5>
+                    <h2 class="section-heading">Información Adicional de Venta</h2>
+                    <div class="form-group">
+                        <label for="starting_price">Precio</label>
+                        {% render_field post_form.starting_price class="common-input" %}
+                        {% if post_form.starting_price.errors %}
+                            <div class="">
+                                {% for error in post_form.starting_price.errors %}
+                                    <p style="color: red;">{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
 
-                <!-- Campo de Enlace de Video -->
-                <div class="form-group">
-                    <label for="videoLink">Enlace de Video (YouTube)</label>
-                    {% render_field form.video_url class="form-control" %}
-                    {% if form.video_url.errors %}
-                        <div class="">
-                            {% for error in form.video_url.errors %}
-                                <p style="color: red;">{{ error }}</p>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                </div>
-              </section>
-              
-              <!-- Paso 3: Información Adicional de Venta -->
-              <h3>Información Adicional de Venta</h3>
-              <section>
-                  <h5 class="bd-wizard-step-title">Paso 4</h5>
-                  <h2 class="section-heading">Información Adicional de Venta</h2>
-                  <div class="form-group">
-                      <label for="precio">Precio</label>
-                    {% render_field form.starting_price class="form-control" %}
-                    {% if form.starting_price.errors %}
-                        <div class="">
-                            {% for error in form.starting_price.errors %}
-                                <p style="color: red;">{{ error }}</p>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                  </div>
-                  <div class="form-group">
-                      <label for="kg">Peso (KG)</label>
-                      {% render_field form.weight class="form-control" %}
-                      {% if form.weight.errors %}
-                        <div class="">
-                            {% for error in form.weight.errors %}
-                                <p style="color: red;">{{ error }}</p>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                  </div>
-              </section>
-
+                    <div class="form-group">
+                        <label for="weight">Peso (KG)</label>
+                        {% render_field post_form.weight class="common-input" %}
+                        {% if post_form.weight.errors %}
+                            <div class="">
+                                {% for error in post_form.weight.errors %}
+                                    <p style="color: red;">{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                </section>
+                
 
             </div>
         </form>
@@ -211,7 +452,7 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        const typeSelect = document.getElementById("id_type");
+        const typeSelect = document.getElementById("id_post_type");
         const endDateField = document.querySelector(".form-group #id_end_date").closest('.form-group');
 
         const toggleEndDateField = () => {
@@ -227,6 +468,7 @@
         typeSelect.addEventListener("change", toggleEndDateField);
     });
 </script>
+
 <script>
     function validateFileCount(input) {
         const maxFiles = 9;
@@ -240,33 +482,27 @@
         }
     }
 </script>
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
 integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
 crossorigin=""></script>
-
 
 <script>
     var map;
     
     document.addEventListener("DOMContentLoaded", function() {
-        map = L.map('map').setView([12.8654, -85.2072], 7);
-
-        map.invalidateSize()
-    
+        map = L.map('map').setView([12.8654, -85.2072], 7);  
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          maxZoom: 19,
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
-
-        
     });
-    // Función para realizar la búsqueda y mostrar sugerencias
+
     async function searchLocation() {
         const input = document.getElementById("id_location").value;
         const autocompleteList = document.getElementById("autocomplete-list");
-        autocompleteList.innerHTML = ""; // Limpiar lista de autocompletar
+        autocompleteList.innerHTML = ""; 
 
-        if (input.length < 3) return; // Espera a que el usuario escriba al menos 3 caracteres
+        if (input.length < 3) return;
 
         const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${input}&addressdetails=1&limit=5&countrycodes=NI`);
         const locations = await response.json();
@@ -276,9 +512,8 @@ crossorigin=""></script>
         item.classList.add("autocomplete-item");
         item.textContent = location.display_name;
         item.onclick = () => {
-            // Centramos el mapa en la ubicación seleccionada
             map.setView([location.lat, location.lon], 13);
-            autocompleteList.innerHTML = ""; // Limpiar lista de autocompletar
+            autocompleteList.innerHTML = ""; 
             document.getElementById("id_location").value = location.display_name
         };
         autocompleteList.appendChild(item);
@@ -286,5 +521,27 @@ crossorigin=""></script>
         });
     }
 </script>
+<script>
+    // Función para manejar el cambio del checkbox
+    document.addEventListener('DOMContentLoaded', function() {
+        const traceabilityCheckbox = document.getElementById('id_traceability');
+        const traceabilitySection = document.getElementById('traceability-section');
 
-{% endblock content %}
+        // Muestra u oculta la sección cuando se cambie el estado del checkbox
+        traceabilityCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                traceabilitySection.style.display = 'block';
+            } else {
+                traceabilitySection.style.display = 'none';
+            }
+        });
+
+        // Verificar el estado inicial del checkbox (en caso de que esté preseleccionado)
+        if (traceabilityCheckbox.checked) {
+            traceabilitySection.style.display = 'block';
+        } else {
+            traceabilitySection.style.display = 'none';
+        }
+    });
+</script>
+{% endblock %}

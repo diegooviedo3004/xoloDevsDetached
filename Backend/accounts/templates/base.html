@@ -220,7 +220,7 @@
                     <!-- Nav Menu Start -->
 <ul class="nav-menu flex-align w-100">
     <li class="nav-menu__item">
-        <a href="{% url 'home' %}" class="nav-menu__link">Inicio</a>
+        <a href="{% url 'index' %}" class="nav-menu__link">Inicio</a>
     </li>
     {% if user.is_authenticated %}
         <li class="on-hover-item nav-menu__item has-submenu">
@@ -234,8 +234,9 @@
                 </li>
             </ul>
         </li>
+        
         <li class="nav-menu__item ">
-            <a href="javascript:void(0)" class="nav-menu__link">Subasta</a>
+            <a href="javascript:void(0)" class="nav-menu__link">Subastas</a>
         </li>
         
         
