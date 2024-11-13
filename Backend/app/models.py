@@ -126,7 +126,7 @@ class Post(TimeStampedModel):
     is_approved = models.BooleanField(default=False) 
     is_active = models.BooleanField(default=True)
 
-    def __str__(self):
+    def _str_(self):
         return f"{self.description[:20]} - {self.post_type}"
 
     class Meta:
@@ -137,7 +137,7 @@ class Category(TimeStampedModel):
     name = models.CharField(max_length = 100)
     description = models.TextField(null = True, blank = True)
 
-    def __str__(self):
+    def _str_(self):
         return self.name
 
     class Meta:
@@ -147,7 +147,7 @@ class Category(TimeStampedModel):
 class Vaccine(TimeStampedModel):
     name = models.CharField(max_length = 100)
     
-    def __str__(self):
+    def _str_(self):
         return self.name
 
     class Meta:
@@ -164,7 +164,7 @@ class ReproductiveData(TimeStampedModel):
     expected_calving_date = models.DateField(null=True, blank=True)
     milk_production_in_liters = models.IntegerField(null=True, blank=True, default=0)
 
-    def __str__(self):
+    def _str_(self):
         return f"Datos reproductivos - {self.traceability}"
 
     class Meta:
@@ -176,7 +176,7 @@ class DairyCowData(TimeStampedModel):
     daily_milk_production_in_liters = models.IntegerField(null=True, blank=True, default=0)
     days_in_milk = models.IntegerField(null=True, blank=True, default=0)
     
-    def __str__(self):
+    def _str_(self):
         return f"Producción diaria: {self.daily_milk_production_in_liters}L"
 
     class Meta:
@@ -196,11 +196,11 @@ class Traceability(TimeStampedModel):
     comments = models.TextField(null=True, blank=True)
 
 
-    # def clean(self):
-    #     if not self.post.traceability:
-    #         raise ValidationError("Creando una trazabilidad para un post sin trazabilidad")
+    def clean(self):
+        if not self.post.traceability:
+            raise ValidationError("Creando una trazabilidad para un post sin trazabilidad")
         
-    def __str__(self):
+    def _str_(self):
         return f"Trazabilidad {self.chapa_code}"
 
     class Meta:
@@ -211,7 +211,7 @@ class PostImage(TimeStampedModel):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to='post_images/')
 
-    def __str__(self):
+    def _str_(self):
         return f"Image for {self.post.description[:20]}"
     
     class Meta:
@@ -236,7 +236,7 @@ class Auction(TimeStampedModel):
         if not self.is_auction_active:
             return self.get_highest_bid
             
-    def __str__(self):
+    def _str_(self):
         return f"Subasta para {self.post.title}"
 
     class Meta:
@@ -247,7 +247,7 @@ class Bid(TimeStampedModel):
     auction = models.ForeignKey(Auction, on_delete=models.CASCADE, related_name='bids')
     amount = models.DecimalField(max_digits=10, decimal_places=2)
 
-    def __str__(self):
+    def _str_(self):
         return f"Bid by {self.user.email} on {self.post.description[:20]} - Amount: {self.amount}"
 
     class Meta:
@@ -256,11 +256,11 @@ class Bid(TimeStampedModel):
         verbose_name_plural = _('ofertas')
 
     def clean(self):
-        if not self.subasta.is_auction_active():
+        if not self.auction.is_auction_active():
             raise ValidationError("No se pueden realizar pujas en una subasta cerrada o fuera de su tiempo activo.")
             
-        highest_bid = self.subasta.get_highest_bid
-        if highest_bid and self.amount <= highest_bid.amount:
+        highest_bid = self.auction.get_highest_bid()
+        if highest_bid and self.amount <= highest_bid:
             raise ValidationError(f"El monto de la puja debe ser mayor a la puja anterior de {highest_bid.amount}")
 
     def save(self, *args, **kwargs):
@@ -288,7 +288,7 @@ class Promotion(models.Model):
         self.amount = plan_prices.get(self.plan, 10.00)
         super().save(*args, **kwargs)
 
-    def __str__(self):
+    def _str_(self):
         return f"{self.post.title} - {self.is_paid}"
 
     def create_stripe_session(self):
@@ -317,4 +317,3 @@ class Promotion(models.Model):
         except Exception as e:
             print(f"Error creando la sesión de pago de Stripe: {e}")
             return None
-
