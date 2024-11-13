@@ -18,6 +18,7 @@ type Props = {
     product ?: any;
     Myorder ?: any;
     completed ?: any;
+    direccion?: any;
     countnumber ?: string;
     onPress ?: (e : any) => void,
     onPress2 ?: any,
@@ -26,7 +27,7 @@ type Props = {
     onPress5 ?: (e : any) => void,
 }
 
-const Cardstyle4 = ({id,title,image,countnumber,price,onPress,brand,product,onPress2,Myorder,btntitle,completed,onPress5,onPress3,onPress4} : Props) => {
+const Cardstyle4 = ({id,title,image,direccion,countnumber,price,onPress,brand,product,onPress2,Myorder,btntitle,completed,onPress5,onPress3,onPress4} : Props) => {
 
     const theme = useTheme();
     const { colors } : {colors : any} = theme;
@@ -170,7 +171,7 @@ const Cardstyle4 = ({id,title,image,countnumber,price,onPress,brand,product,onPr
                     <Text style={{...FONTS.fontMedium,fontSize:16,color:colors.title,paddingRight:40}}>{title}</Text>
                 </View>
                 <View>
-                    <Text style={{...FONTS.fontRegular,fontSize:14,color:'#9A9A9A',paddingRight:40}}>San Marcos</Text>
+                    <Text style={{...FONTS.fontRegular,fontSize:14,color:'#9A9A9A',paddingRight:40}}>{direccion}</Text>
                 </View>
                 {Myorder ?
                     null

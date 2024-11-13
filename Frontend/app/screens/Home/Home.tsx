@@ -12,6 +12,8 @@ import { addTowishList } from '../../redux/reducer/wishListReducer';
 import ImageSwiper from '../../components/ImageSwiper';
 import Cardstyle4 from '../../components/Card/Cardstyle4';
 import { openDrawer } from '../../redux/actions/drawerAction';
+import {gettingAllPost} from "./ViewModel/gettingAllPost";
+import {useAuthStore} from "../../store/useAuthStore";
 import {usePostStore} from "../../store/usePostStore";
 
 
@@ -119,6 +121,23 @@ const SwiperData = [
 type HomeScreenProps = StackScreenProps<RootStackParamList, 'Home'>
 
 export const Home = ({ navigation }: HomeScreenProps) => {
+    const [post, setPost] = useState<any[]>([]); // Inicializamos como un array vacío
+    const [loading, setLoading] = useState(true); // Estado de carga
+    const { access } = useAuthStore();
+
+    useEffect(() => {
+        const fetchPosts = async () => {
+            const data = await gettingAllPost(access);
+            if (data) {
+                setPost(data);
+            } else {
+                setPost([]);
+            }
+            setLoading(false);
+        };
+
+        fetchPosts();
+    }, [access]);
 
     // const wishList = useSelector((state:any) => state.wishList.wishList);
     // console.log(wishList);
@@ -381,7 +400,7 @@ const styles = StyleSheet.create({
         //textAlign:'right'
     },
     colorCard:{
-        
+
     },
     colorCardTitle:{
         ...FONTS.fontMedium,
@@ -406,7 +425,7 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 0.34,
         shadowRadius: 18.27,
-        elevation: 4, 
+        elevation: 4,
     }
 })
 
