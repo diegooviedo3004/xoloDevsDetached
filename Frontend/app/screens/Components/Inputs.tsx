@@ -32,7 +32,7 @@ const Inputs = () => {
                 />
                 <ScrollView>
                     <View style={GlobalStyleSheet.container}>
-                    <View style={[GlobalStyleSheet.card,{backgroundColor:colors.card}]}>
+                        <View style={[GlobalStyleSheet.card,{backgroundColor:colors.card}]}>
 
                             <View style={[GlobalStyleSheet.cardHeader,{borderBottomColor:COLORS.inputborder}]}>
                                 <Text style={{...FONTS.fontMedium,fontSize:14,color:colors.title}}>Classic Input</Text>

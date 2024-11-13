@@ -1,5 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Alert, FlatList, Image, Modal, TouchableOpacity, Switch, TextInput } from 'react-native';
+import {
+    View,
+    Text,
+    StyleSheet,
+    Alert,
+    Image,
+    Modal,
+    TouchableOpacity,
+    Switch,
+    TextInput,
+    ScrollView, Dimensions
+} from 'react-native';
 import { Button } from "react-native-paper";
 import { useTheme } from "@react-navigation/native";
 import { ProgressStep, ProgressSteps } from "@ouedraogof/react-native-progress-steps";
@@ -9,7 +20,11 @@ import Header from "../../layout/Header";
 import Input from "../../components/Input/Input";
 import useLocation from "../../Hook/useLocation";
 import { Feather } from "@expo/vector-icons";
-import { FONTS } from "../../constants/theme";
+import {COLORS, FONTS} from "../../constants/theme";
+import {GlobalStyleSheet} from "../../constants/StyleSheet";
+import { FlashList } from "@shopify/flash-list";
+import {FlatList} from "react-native-gesture-handler";
+import FeatherIcon from 'react-native-vector-icons/Feather';
 
 interface LocationDataItem {
     key: string;
@@ -19,6 +34,7 @@ interface LocationDataItem {
         longitude: number;
     };
 }
+
 
 const CreatePublication: React.FC = () => {
     const theme = useTheme();
@@ -33,6 +49,21 @@ const CreatePublication: React.FC = () => {
         trazabilidad: false,
         video_url: '',
         usar_ubicacion_usuario: false,
+        post_type: '',
+        chapa_code: '',
+        breed_M: '',
+        breed_P: '',
+        health_status: '',
+        comments: '',
+        birth_date: new Date(),
+        last_calving: new Date(),
+        breeding_date: new Date(),
+        last_heat_date: new Date(),
+        days_pregnant: '',
+        expected_calving_date: new Date(),
+        milk_production_in_liters: '',
+        daily_milk_production_in_liters: '',
+        days_in_milk: '',
     });
 
     const [images, setImages] = useState<string[]>([]);
@@ -68,11 +99,18 @@ const CreatePublication: React.FC = () => {
     const searchLocation = async (input: string) => {
         try {
             const response = await fetch(
-                `https://nominatim.openstreetmap.org/search?format=json&q=${input}&addressdetails=1&limit=5&countrycodes=NI`
+                `https://nominatim.openstreetmap.org/search?format=json&q=${input}&addressdetails=1&limit=5&countrycodes=NI`,
+                {
+                    headers: {
+                        'User-Agent': 'YourAppName/1.0 (contact@yourdomain.com)'
+                    }
+                }
             );
-            const locations = await response.json();
 
-            const searchResults: LocationDataItem[] = locations.map((location: any) => ({
+            const responseData: LocationDataItem[] = await response.text();
+            console.log(responseData);
+
+            const searchResults: LocationDataItem[] = responseData.map((location: any) => ({
                 key: location.place_id.toString(),
                 value: location.display_name,
                 coordinates: {
@@ -134,96 +172,227 @@ const CreatePublication: React.FC = () => {
             <View style={{ flex: 1 }}>
                 <ProgressSteps {...activeStepStyles}>
                     <ProgressStep label="Detalles Generales" nextBtnTextStyle={buttonTextStyle} previousBtnTextStyle={buttonTextStyle}>
-                        <View style={{ padding: 16 }}>
-                            <Text>Título</Text>
-                            <Input placeholder="Título" value={formData.titulo} onChangeText={(text) => handleInputChange('titulo', text)} />
-                            <Text>Descripción</Text>
-                            <Input placeholder="Descripción" value={formData.descripcion} onChangeText={(text) => handleInputChange('descripcion', text)} />
-                            <Text>Precio</Text>
-                            <Input placeholder="Precio" value={formData.precio} onChangeText={(text) => handleInputChange('precio', text)} />
-                            <Text>Sexo</Text>
-                            <View style={styles.optionContainer}>
-                                {['Hembra', 'Macho'].map(option => (
-                                    <TouchableOpacity
-                                        key={option}
-                                        style={[styles.optionButton, formData.sexo === option && styles.optionButtonSelected]}
-                                        onPress={() => handleInputChange('sexo', option)}
-                                    >
-                                        <Text style={formData.sexo === option ? styles.optionTextSelected : styles.optionText}>
-                                            {option}
-                                        </Text>
-                                    </TouchableOpacity>
-                                ))}
+                        <ScrollView>
+                            <View style={GlobalStyleSheet.container}>
+                                <View style={[GlobalStyleSheet.card,{backgroundColor:colors.card}]}>
+                                    <View style={[GlobalStyleSheet.cardHeader,{borderBottomColor:COLORS.inputborder}]}>
+                                        <Text style={{...FONTS.fontMedium,fontSize:14,color:colors.title}}>Informacion Basica</Text>
+                                    </View>
+                                    <View style={GlobalStyleSheet.cardBody}>
+                                        <View style={{marginBottom:10}}>
+                                            <Input placeholder="Título"
+                                                   value={formData.titulo}
+                                                   onChangeText={(text) => handleInputChange('titulo', text)} />
+                                        </View>
+                                        <View style={{marginBottom:10}}>
+                                            <Input placeholder="Descripción"
+                                                   value={formData.descripcion}
+                                                   onChangeText={(text) => handleInputChange('descripcion', text)} />
+                                        </View>
+                                        <View style={{marginBottom:10}}>
+                                            <Input placeholder="Precio"
+                                                   value={formData.precio}
+                                                   onChangeText={(text) => handleInputChange('precio', text)} />
+                                        </View>
+                                        <View style={[GlobalStyleSheet.cardHeader,{borderBottomColor:COLORS.inputborder}]}>
+                                            <Text style={{...FONTS.fontMedium,fontSize:14,color:colors.title}}>Sexo</Text>
+                                        </View>
+                                        <View style={styles.optionContainer}>
+                                            {['Hembra', 'Macho'].map(option => (
+                                                <TouchableOpacity
+                                                    key={option}
+                                                    style={[styles.optionButton, formData.sexo === option && styles.optionButtonSelected]}
+                                                    onPress={() => handleInputChange('sexo', option)}
+                                                >
+                                                    <Text style={formData.sexo === option ? styles.optionTextSelected : styles.optionText}>
+                                                        {option}
+                                                    </Text>
+                                                </TouchableOpacity>
+                                            ))}
+                                        </View>
+                                        <View style={[GlobalStyleSheet.cardHeader,{borderBottomColor:COLORS.inputborder}]}>
+                                            <Text style={{...FONTS.fontMedium,fontSize:14,color:colors.title}}>Raza</Text>
+                                        </View>
+                                        <View style={{marginBottom:10}}>
+                                            <Input placeholder="Raza"
+                                                   value={formData.raza}
+                                                   onChangeText={(text) => handleInputChange('raza', text)} />
+                                        </View>
+                                    </View>
+                                </View>
                             </View>
-                            <Text>Raza</Text>
-                            <Input placeholder="Raza" value={formData.raza} onChangeText={(text) => handleInputChange('raza', text)} />
-                        </View>
+                        </ScrollView>
                     </ProgressStep>
 
                     <ProgressStep label="Configuración Adicional" nextBtnTextStyle={buttonTextStyle} previousBtnTextStyle={buttonTextStyle}>
-                        <View style={{ padding: 16 }}>
-                            <View>
-                                <Text>Configurar Trazabilidad</Text>
-                                <Switch value={formData.trazabilidad} onValueChange={(value) => handleInputChange('trazabilidad', value)} />
-                            </View>
-                            <View>
-                                <Text>Usar Coordenadas del Usuario</Text>
-                                <Switch value={formData.usar_ubicacion_usuario} onValueChange={(value) => handleInputChange('usar_ubicacion_usuario', value)} />
-                            </View>
-                            <View>
-                                <Text>URL del Video</Text>
-                                <Input placeholder="Enlace del video" value={formData.video_url} onChangeText={(text) => handleInputChange('video_url', text)} />
-                            </View>
-                            <View>
-                                <Text style={{ marginTop: 20 }}>Imágenes</Text>
-                                <Button onPress={pickImage} mode="contained" style={{ marginVertical: 10, backgroundColor: '#4CAF50'}}>
-                                    Seleccionar imágenes
-                                </Button>
-                                <FlatList
-                                    horizontal
-                                    data={images}
-                                    keyExtractor={(item, index) => index.toString()}
-                                    renderItem={({ item, index }) => (
-                                        <TouchableOpacity onPress={() => setSelectedImage(item)}>
-                                            <Image source={{ uri: item }} style={styles.selectedImage} />
-                                            <TouchableOpacity style={styles.deleteButton} onPress={() => setImages(images.filter((_, i) => i !== index))}>
-                                                <Text style={{ color: 'white', fontWeight: 'bold' }}>X</Text>
-                                            </TouchableOpacity>
-                                        </TouchableOpacity>
-                                    )}
-                                />
-                            </View>
-                        </View>
+                            <ScrollView>
+                                <View style={GlobalStyleSheet.container}>
+                                    <View style={[GlobalStyleSheet.card,{backgroundColor:colors.card}]}>
+                                        {/*Configuracion*/}
+                                        <View style={[GlobalStyleSheet.cardHeader,{borderBottomColor:COLORS.inputborder}]}>
+                                            <Text style={{...FONTS.fontMedium,fontSize:14,color:colors.title}}>Configuracion</Text>
+                                        </View>
+                                        <View style={GlobalStyleSheet.cardBody}>
+                                            <View style={{flexDirection: 'row', alignItems: 'center', marginVertical: 10,}}>
+                                                <Text style={{ flex: 1, fontSize: 16,}}>Trazabilidad</Text>
+                                                <Switch
+                                                    value={formData.trazabilidad}
+                                                    onValueChange={(value) => handleInputChange('trazabilidad', value)}
+                                                />
+                                            </View>
+                                            <View style={{flexDirection: 'row', alignItems: 'center', marginVertical: 10,}}>
+                                                <Text style={{ flex: 1, fontSize: 16,}}>Usar Coordenadas del Usuario</Text>
+                                                <Switch
+                                                    value={formData.usar_ubicacion_usuario}
+                                                    onValueChange={(value) => handleInputChange('usar_ubicacion_usuario', value)} />
+                                            </View>
+                                        </View>
+                                            {/*Imagenes*/}
+                                            <View style={[GlobalStyleSheet.cardHeader,{borderBottomColor:COLORS.inputborder, marginBottom: 10}]}>
+                                                <Text style={{...FONTS.fontMedium,fontSize:14,color:colors.title}}>Videos y Imagenes</Text>
+                                            </View>
+                                        <View style={GlobalStyleSheet.cardBody}>
+                                            <View style={{marginBottom:10}}>
+                                                <Input placeholder="URL video de Youtube"
+                                                       value={formData.video_url}
+                                                       onChangeText={(text) => handleInputChange('video_url', text)} />
+                                            </View>
+                                            <View style={{ marginBottom:10 }}>
+                                                <Button onPress={pickImage} mode="contained" style={{ marginVertical: 10, backgroundColor: '#4CAF50'}}>
+                                                    Seleccionar imágenes
+                                                </Button>
+                                                <FlatList
+                                                    horizontal
+                                                    data={images}
+                                                    keyExtractor={(item, index) => index.toString()}
+                                                    renderItem={({ item, index }) => (
+                                                        <TouchableOpacity onPress={() => setSelectedImage(item)}>
+                                                            <Image source={{ uri: item }} style={styles.selectedImage} />
+                                                            <TouchableOpacity style={styles.deleteButton} onPress={() => setImages(images.filter((_, i) => i !== index))}>
+                                                                <Text style={{ color: 'white', fontWeight: 'bold' }}>X</Text>
+                                                            </TouchableOpacity>
+                                                        </TouchableOpacity>
+                                                    )}
+                                                />
+                                            </View>
+                                        </View>
+                                        {/*Trazabilidad*/}
+                                        {formData.trazabilidad && (
+                                            <>
+                                                {/* Traceability Header */}
+                                                <View style={[GlobalStyleSheet.cardHeader, { borderBottomColor: COLORS.inputborder, marginBottom: 10 }]}>
+                                                    <Text style={{ ...FONTS.fontMedium, fontSize: 14, color: colors.title }}>Configuracion de Trazabilidad</Text>
+                                                </View>
+
+                                                {/* Traceability Body */}
+                                                <View style={GlobalStyleSheet.cardBody}>
+                                                    <View style={{ marginBottom: 10 }}>
+                                                        <Input
+                                                            placeholder="Código de Chapa"
+                                                            value={formData.chapa_code}
+                                                            onChangeText={(text) => handleInputChange('chapa_code', text)}
+                                                        />
+                                                    </View>
+
+                                                    <View style={{ marginBottom: 10 }}>
+                                                        <Input
+                                                            placeholder="Raza Madre"
+                                                            value={formData.breed_M}
+                                                            onChangeText={(text) => handleInputChange('breed_M', text)}
+                                                        />
+                                                    </View>
+
+                                                    <View style={{ marginBottom: 10 }}>
+                                                        <Input
+                                                            placeholder="Raza Padre"
+                                                            value={formData.breed_P}
+                                                            onChangeText={(text) => handleInputChange('breed_P', text)}
+                                                        />
+                                                    </View>
+
+                                                    <View style={{ marginBottom: 10 }}>
+                                                        <Input
+                                                            placeholder="Estado de Salud"
+                                                            value={formData.health_status}
+                                                            onChangeText={(text) => handleInputChange('health_status', text)}
+                                                        />
+                                                    </View>
+
+                                                    <View style={{ marginBottom: 10 }}>
+                                                        <Input
+                                                            placeholder="Comentarios"
+                                                            value={formData.comments}
+                                                            onChangeText={(text) => handleInputChange('comments', text)}
+                                                        />
+                                                    </View>
+                                                </View>
+                                            </>
+                                        )}
+                                    </View>
+                                </View>
+                            </ScrollView>
                     </ProgressStep>
 
                     <ProgressStep label="Mapa" nextBtnTextStyle={buttonTextStyle} previousBtnTextStyle={buttonTextStyle}>
-                        <View style={{ padding: 16 }}>
-                            <View style={styles.searchContainer}>
-                                <Feather name="search" size={20} color={colors.title} />
-                                <TextInput
-                                    style={styles.searchInput}
-                                    placeholder="Buscar ubicación..."
-                                    value={searchText}
-                                    onChangeText={setSearchText}
-                                />
-                            </View>
-                            <FlatList
-                                data={locationData}
-                                keyExtractor={(item) => item.key.toString()}
-                                renderItem={({ item }) => (
-                                    <TouchableOpacity onPress={() => {
-                                        setSearchText(item.value);
-                                        setLatitude(item.coordinates.latitude);
-                                        setLongitude(item.coordinates.longitude);
-                                    }}>
-                                        <Text style={styles.listItem}>{item.value}</Text>
-                                    </TouchableOpacity>
-                                )}
-                            />
-                            <View style={styles.mapPlaceholder}>
-                                <MapView style={StyleSheet.absoluteFillObject} region={mapRegion}>
-                                    <Marker coordinate={{ latitude: mapRegion.latitude, longitude: mapRegion.longitude }} />
-                                </MapView>
+                        <View style={GlobalStyleSheet.container}>
+                            <View style={[GlobalStyleSheet.card,{backgroundColor:colors.card}]}>
+                                {/*Mapa*/}
+                                <View style={GlobalStyleSheet.cardBody}>
+                                    <View style={[GlobalStyleSheet.row,{alignItems:'center',gap:10}]}>
+                                        <TouchableOpacity
+                                            // onPress={() => navigation.goBack()}
+                                            style={{   height:45,
+                                                width:45,
+                                                borderRadius:45,
+                                                alignItems:'center',
+                                                justifyContent:'center',
+                                                backgroundColor:COLORS.background}}
+                                        >
+                                            <FeatherIcon size={24} color={COLORS.title} name={'search'} />
+                                        </TouchableOpacity>
+                                        <View style={{flex:1}}>
+                                            <TextInput
+                                                placeholder="Buscar ubicación..."
+                                                value={searchText}
+                                                onChangeText={setSearchText}
+                                                placeholderTextColor={COLORS.text}
+                                                style={{
+                                                    ...FONTS.fontRegular,
+                                                    height:48,
+                                                    width:'100%',
+                                                    borderRadius:30,
+                                                    paddingHorizontal:20,
+                                                    color:COLORS.title,
+                                                    fontSize:14,
+                                                    backgroundColor:COLORS.background
+                                                }}
+                                            />
+                                        </View>
+                                    </View>
+                                    <View style={{ height: 200, width: Dimensions.get("screen").width }}>
+                                        <FlashList
+                                            data={locationData}
+                                            keyExtractor={(item) => item.key.toString()}
+                                            renderItem={({ item }) => (
+                                                <TouchableOpacity onPress={() => {
+                                                    setSearchText(item.value);
+                                                    setLatitude(item.coordinates.latitude);
+                                                    setLongitude(item.coordinates.longitude);
+                                                }}>
+                                                    <Text style={styles.listItem}>{item.value}</Text>
+                                                </TouchableOpacity>
+                                            )}
+                                            estimatedItemSize={200}
+                                        />
+                                        <View style={{padding: 16}}>
+                                            <View style={styles.mapPlaceholder}>
+                                                <MapView style={StyleSheet.absoluteFillObject} region={mapRegion}>
+                                                    <Marker coordinate={{ latitude: mapRegion.latitude, longitude: mapRegion.longitude }} />
+                                                </MapView>
+                                            </View>
+                                        </View>
+                                    </View>
+                                </View>
                             </View>
                         </View>
                     </ProgressStep>
@@ -249,6 +418,7 @@ const CreatePublication: React.FC = () => {
 };
 const styles = StyleSheet.create({
     optionContainer: {
+        marginBottom:10,
         flexDirection: 'row',
         marginVertical: 10,
     },

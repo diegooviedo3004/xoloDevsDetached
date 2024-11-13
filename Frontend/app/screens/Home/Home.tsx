@@ -308,21 +308,21 @@ export const Home = ({ navigation }: HomeScreenProps) => {
                 {/*</View>*/}
                 <View style={[GlobalStyleSheet.container,{paddingHorizontal:30,flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between",  alignItems: "start", marginTop: 5 }]}>
 
-                        {post?.map((data:any, index:any) => {
-                            return (
-                                    <Cardstyle4
-                                        key={index}
-                                        direccion={data.location}
-                                        id={data.id}
-                                        image={IMAGES.vacasCards1}
-                                        price={data.starting_price}
-                                        // countnumber={data.countnumber}
-                                        title={data.title}
-                                        onPress={() => navigation.navigate('ProductsDetails')}
-                                        onPress5={() => addItemToWishList(data)}
-                                    />
-                            );
-                        })}
+                        {/*{post?.map((data:any, index:any) => {*/}
+                        {/*    return (*/}
+                        {/*            <Cardstyle4*/}
+                        {/*                key={index}*/}
+                        {/*                direccion={data.location}*/}
+                        {/*                id={data.id}*/}
+                        {/*                image={IMAGES.vacasCards1}*/}
+                        {/*                price={data.starting_price}*/}
+                        {/*                // countnumber={data.countnumber}*/}
+                        {/*                title={data.title}*/}
+                        {/*                onPress={() => navigation.navigate('ProductsDetails')}*/}
+                        {/*                onPress5={() => addItemToWishList(data)}*/}
+                        {/*            />*/}
+                        {/*    );*/}
+                        {/*})}*/}
 
                 </View>
             </ScrollView>
