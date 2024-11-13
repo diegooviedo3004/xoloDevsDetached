@@ -3,7 +3,7 @@ import { io } from "socket.io-client";
 import { useAuthStore } from "../store/useAuthStore";
 
 const SocketContext = createContext(null);
-const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+const apiUrl = "http://192.168.100.6:8000/";
 
 export const SocketProvider = ({ children }) => {
     const { access } = useAuthStore();

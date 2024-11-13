@@ -49,6 +49,8 @@ const Cardstyle4 = ({id,title,image,countnumber,price,onPress,brand,product,onPr
         dispatch(removeFromwishList(id as any));
     }
 
+    console.log(image)
+
     return (
         <TouchableOpacity
             activeOpacity={0.8}
@@ -69,8 +71,8 @@ const Cardstyle4 = ({id,title,image,countnumber,price,onPress,brand,product,onPr
                 }}
             >
                     <Image
-                        style={{height:undefined,width:'100%',aspectRatio:1/1.2,}}
-                        source={image}
+                        style={{width:'100%',aspectRatio:1/1.2,}}
+                        src={image}
                     />
             </View>
                 <View

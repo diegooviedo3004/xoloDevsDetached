@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import { View, Text, ScrollView, Image, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { GlobalStyleSheet } from '../../constants/StyleSheet';
@@ -12,6 +12,7 @@ import { addTowishList } from '../../redux/reducer/wishListReducer';
 import ImageSwiper from '../../components/ImageSwiper';
 import Cardstyle4 from '../../components/Card/Cardstyle4';
 import { openDrawer } from '../../redux/actions/drawerAction';
+import {usePostStore} from "../../store/usePostStore";
 
 
 const ArrivalData = [
@@ -130,6 +131,12 @@ export const Home = ({ navigation }: HomeScreenProps) => {
     const addItemToWishList = (data: any) => {
         dispatch(addTowishList(data));
     }
+
+    const { posts,startLoadingPosts, startSetActivePost } = usePostStore();
+
+    useEffect(() => {
+        startLoadingPosts()
+    }, []);
     
     return (
         <View style={{ backgroundColor: colors.card, flex: 1 }}>
@@ -289,16 +296,22 @@ export const Home = ({ navigation }: HomeScreenProps) => {
                 {/*</View>*/}
                 <View style={[GlobalStyleSheet.container,{paddingHorizontal:30,flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between",  alignItems: "start", marginTop: 5 }]}>
 
-                        {CardStyleData.map((data:any, index:any) => {
+                        {posts.map((data:any, index:any) => {
                             return (
                                     <Cardstyle4
                                         key={index}
                                         id={data.id}
-                                        image={data.image}
-                                        price={data.price}
+                                        image={data.images[0].image}
+                                        price={data.starting_price}
                                         countnumber={data.countnumber}
                                         title={data.title}
-                                        onPress={() => navigation.navigate('ProductsDetails')}
+                                        onPress={async() => {
+                                            await startSetActivePost(data.id);
+                                            setTimeout(() => {
+
+                                                navigation.navigate('ProductsDetails')
+                                            }, 100)
+                                        }}
                                         onPress5={() => addItemToWishList(data)}
                                     />
                             );
