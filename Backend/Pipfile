@@ -37,6 +37,7 @@ django-widget-tweaks = "*"
 cloudinary = "*"
 django-cloudinary-storage = "*"
 stripe = "*"
+faker = "*"
 
 [dev-packages]
 

@@ -256,11 +256,11 @@ class Bid(TimeStampedModel):
         verbose_name_plural = _('ofertas')
 
     def clean(self):
-        if not self.subasta.is_auction_active():
+        if not self.auction.is_auction_active():
             raise ValidationError("No se pueden realizar pujas en una subasta cerrada o fuera de su tiempo activo.")
             
-        highest_bid = self.subasta.get_highest_bid
-        if highest_bid and self.amount <= highest_bid.amount:
+        highest_bid = self.auction.get_highest_bid()
+        if highest_bid and self.amount <= highest_bid:
             raise ValidationError(f"El monto de la puja debe ser mayor a la puja anterior de {highest_bid.amount}")
 
     def save(self, *args, **kwargs):
