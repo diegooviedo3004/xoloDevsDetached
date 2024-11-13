@@ -58,6 +58,7 @@ type WishlistScreenProps = StackScreenProps<RootStackParamList, 'Wishlist'>;
 const Wishlist = ({navigation} : WishlistScreenProps) => {
 
     const wishList = useSelector((state:any) => state.wishList.wishList);
+
     const dispatch = useDispatch();
 
     const theme = useTheme();
@@ -87,10 +88,10 @@ const Wishlist = ({navigation} : WishlistScreenProps) => {
                             <View key={index} style={{marginBottom:15}}>
                                 <Cardstyle2
                                     id={data.id}
-                                    brand={data.brand}
-                                    image={data.image}
+                                    brand={data.description}
+                                    image={data.images[0].image}
                                     price={data.price}
-                                    countnumber={data.countnumber} 
+                                    countnumber={data.countnumber}
                                     title={data.title}
                                     onPress={() => navigation.navigate('ProductsDetails')}                                        
                                     // onPress2={() => addItemToWishList(data)}                                
