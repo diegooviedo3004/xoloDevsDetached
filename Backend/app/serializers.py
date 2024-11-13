@@ -27,6 +27,8 @@ class PostSerializer(serializers.ModelSerializer):
     dairy_cow_data = DairyCowDataSerializer(required=False)
     reproductive_data = ReproductiveDataSerializer(required=False)
     images = PostImageSerializer(many=True, required=False)
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
+
 
     class Meta:
         model = Post

@@ -7,8 +7,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import CreateView, TemplateView, ListView
 from django.urls import reverse_lazy
 from rest_framework.viewsets import ModelViewSet
-from .models import Post, PostImage, Auction, Post, Promotion
-from .serializers import PostSerializer
+from .models import Post, PostImage, Auction, Post, Promotion, Traceability, ReproductiveData,DairyCowData
+from .serializers import PostSerializer, TraceabilitySerializer, DairyCowDataSerializer, ReproductiveDataSerializer
 from django.contrib.auth import get_user_model
 from .forms import PostForm, PostImageForm, TraceabilityForm, PostImageForm, DairyCowDataForm, ReproductiveDataForm
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
@@ -112,6 +112,32 @@ class PostViewSet(ModelViewSet):
 
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+
+class PostDetailView(APIView):
+
+    def get(self, request, pk):
+        try:
+            post = Post.objects.get(id=pk)
+
+            # Obtenemos los datos relacionados
+            traceability_data = Traceability.objects.filter(post=post).first()
+            dairy_cow_data = DairyCowData.objects.filter(traceability=traceability_data).first()
+            reproductive_data = ReproductiveData.objects.filter(traceability=traceability_data).first()
+
+            # Serializamos los datos si existen
+            traceability_serializer = TraceabilitySerializer(traceability_data)
+            dairy_cow_data_serializer = DairyCowDataSerializer(dairy_cow_data)
+            reproductive_data_serializer = ReproductiveDataSerializer(reproductive_data)
+
+            # Respondemos con los datos relacionados
+            return Response({
+                'traceability_data': traceability_serializer.data if traceability_data else None,
+                'dairy_cow_data': dairy_cow_data_serializer.data if dairy_cow_data else None,
+                'reproductive_data': reproductive_data_serializer.data if reproductive_data else None,
+            }, status=status.HTTP_200_OK)
+
+        except Post.DoesNotExist:
+            return Response({"detail": "Post not found"}, status=status.HTTP_404_NOT_FOUND)
 
 @csrf_exempt
 def stripe_webhook(request):

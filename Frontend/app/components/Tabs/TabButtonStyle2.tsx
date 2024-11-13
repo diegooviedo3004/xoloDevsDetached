@@ -4,9 +4,9 @@ import { useTheme } from '@react-navigation/native';
 import { COLORS, FONTS, SIZES } from '../../constants/theme';
 
 type Props = {
-    buttons ?: any; 
-    onClick ?: any; 
-    scrollX ?: any; 
+    buttons ?: any;
+    onClick ?: any;
+    scrollX ?: any;
 }
 
 const TabButtonStyle2 = ({ buttons, onClick, scrollX }:Props) => {
@@ -21,12 +21,12 @@ const TabButtonStyle2 = ({ buttons, onClick, scrollX }:Props) => {
         outputRange: [0, -btnWidth],
     });
     const { colors } = useTheme();
-    
+
     return (
         <View
             style={{...styles.btnContainer}}
             onLayout={e => setWidth(e.nativeEvent.layout.width)}>
-             
+
             {buttons.map((btn:any, i:any) => (
                 <TouchableOpacity
                     key={btn}
@@ -49,14 +49,14 @@ const TabButtonStyle2 = ({ buttons, onClick, scrollX }:Props) => {
                         ]}>
                         <Text style={{...FONTS.font,...FONTS.fontSemiBold,color:COLORS.white}}>{btn}</Text>
                         <View
-                          style={{
-                            height:45,
-                            width:btnWidth,
-                            backgroundColor:COLORS.primary,
-                            position:'absolute',
-                            bottom:0,
-                            zIndex:-1,
-                          }}
+                            style={{
+                                height:45,
+                                width:btnWidth,
+                                backgroundColor:COLORS.primary,
+                                position:'absolute',
+                                bottom:0,
+                                zIndex:-1,
+                            }}
                         />
                     </Animated.View>
                 ))}

@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import api from "../axios/api";
 import {setActiveChat, setChats} from "../redux/reducer/chatReducer";
-import {setActivePost, setPosts} from "../redux/reducer/postReducer";
+import {setActivePost, setActiveTraceability, setPosts} from "../redux/reducer/postReducer";
 
 interface Post {
     id: number;
@@ -33,13 +33,13 @@ interface usePostStore {
 }
 
 export const usePostStore = (): usePostStore => {
-    const { posts,activePost  } = useSelector((state: any) => state.post);
+    const { posts,activePost, activeTraceability  } = useSelector((state: any) => state.post);
     const dispatch = useDispatch();
 
     const startLoadingPosts = async (): Promise<void> => {
         try {
             const { data } = await api.get('/posts/');
-            dispatch(setPosts(data.slice(0, 11)));
+            dispatch(setPosts(data.slice(0, 30)));
         } catch (error) {
             console.error(error);
         }
@@ -54,10 +54,21 @@ export const usePostStore = (): usePostStore => {
         }
     };
 
+    const startSetActiveTraceability = async (id: Number): Promise<void> => {
+        try {
+            const { data } = await api.get(`/posts-detail/${id}/`);
+            dispatch(setActiveTraceability(data));
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     return {
         posts,
         activePost,
         startLoadingPosts,
         startSetActivePost,
+        startSetActiveTraceability,
+        activeTraceability,
     };
 };

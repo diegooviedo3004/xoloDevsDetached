@@ -29,7 +29,8 @@ interface PostState {
 
 const initialState: PostState = {
     posts: [],
-    activePost: null
+    activePost: null,
+    activeTraceability: null
 };
 
 export const postSlice = createSlice({
@@ -42,10 +43,13 @@ export const postSlice = createSlice({
         setPosts: (state, action: PayloadAction<Post[]>) => {
             state.posts = action.payload;
         },
+        setActiveTraceability: (state, action: PayloadAction<Post[]>) => {
+            state.activeTraceability = action.payload;
+        },
     },
 });
 
 // Action creators are generated for each case reducer function
-export const { setActivePost, setPosts } = postSlice.actions;
+export const { setActivePost, setPosts, setActiveTraceability } = postSlice.actions;
 
 export default postSlice.reducer;

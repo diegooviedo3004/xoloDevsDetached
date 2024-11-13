@@ -1,15 +1,16 @@
-import React,{ useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { COLORS, FONTS, SIZES } from '../../constants/theme';
 import { useTheme } from '@react-navigation/native';
+import {usePostStore} from "../../store/usePostStore";
 
 type Props = {
-    buttons ?: any; 
-    onClick ?: any; 
-    scrollX ?: any; 
+    buttons ?: any;
+    onClick ?: any;
+    scrollX ?: any;
 }
 
-const TabButtonStyle1 = ({ buttons, onClick, scrollX } : Props) => {
+const TabButtonStyle1 = ({ buttons, onClick, scrollX, id } : Props) => {
 
     const {colors} = useTheme();
 
@@ -28,15 +29,16 @@ const TabButtonStyle1 = ({ buttons, onClick, scrollX } : Props) => {
         <View
             style={{...styles.btnContainer,borderBottomWidth:1,borderColor:colors.border}}
             onLayout={e => setWidth(e.nativeEvent.layout.width)}>
-             
+
             {buttons.map((btn:any, i:any) => (
                 <TouchableOpacity
                     key={btn}
                     style={styles.btn}
                     onPress={() => onClick(i)}>
-                    <Text style={{...FONTS.font,...FONTS.fontMedium,color:colors.text}}>{btn}</Text>
+                    <Text style={{...FONTS.font,...FONTS.fontMedium,color:colors.text, fontSize: 16}}>{btn}</Text>
                 </TouchableOpacity>
             ))}
+
             <Animated.View
                 style={[
                     styles.animatedBtnContainer,
@@ -50,15 +52,15 @@ const TabButtonStyle1 = ({ buttons, onClick, scrollX } : Props) => {
                             styles.animatedBtn,
                             { width: btnWidth, transform: [{ translateX: translateXOpposit }] },
                         ]}>
-                        <Text style={{...FONTS.font,...FONTS.fontMedium,color:COLORS.primary}}>{btn}</Text>
+                        <Text style={{...FONTS.font,...FONTS.fontMedium,color:COLORS.primary, fontSize: 16}}>{btn}</Text>
                         <View
-                          style={{
-                            height:3,
-                            width:btnWidth,
-                            backgroundColor:COLORS.primary,
-                            position:'absolute',
-                            bottom:0,
-                          }}
+                            style={{
+                                height:3,
+                                width:btnWidth,
+                                backgroundColor:COLORS.primary,
+                                position:'absolute',
+                                bottom:0,
+                            }}
                         />
                     </Animated.View>
                 ))}
@@ -92,6 +94,7 @@ const styles = StyleSheet.create({
     btnTextActive: {
         color: '#fff',
         fontWeight: 'bold',
+
     },
 })
 
