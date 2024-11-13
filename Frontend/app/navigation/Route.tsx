@@ -2,13 +2,16 @@ import React from 'react';
 import { ThemeContextProvider } from '../constants/ThemeContext';
 import { Text } from 'react-native';
 import StackNavigator from './StackNavigator';
+import {SocketProvider} from "../socket/SocketProvider";
 
 const Route = () => {
 
 	return (
-		<ThemeContextProvider>
-			<StackNavigator/>
-		</ThemeContextProvider>
+		<SocketProvider>
+			<ThemeContextProvider>
+				<StackNavigator/>
+			</ThemeContextProvider>
+		</SocketProvider>
 	)
   
 }

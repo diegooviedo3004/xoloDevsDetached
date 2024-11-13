@@ -3,20 +3,7 @@
 *.pot
 *.pyc
 __pycache__
-db.sqlite3
-
-# custom files
-test.pdf
-test.xlsx
-test.py
-/otros
-3.- Ejemplo Cotizacion.pdf
-2.- Ejemplo cotizacion ORVI 99 10 pagos UDIS.pdf
-2.- Ejemplo Dotal 10 años.pdf
-3.- Ejemplo Dotal 20 años.pdf
-2.- Ejemplo Cotizacion Educación UDIS.pdf
-3.- Ejemplo Cotizacion Inversiones.pdf
-output_page.png
+media
 
 # Backup files # 
 *.bak 

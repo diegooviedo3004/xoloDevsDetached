@@ -1,5 +1,15 @@
 {
   "build": {
+    "production": {
+      "env": {
+        "EXPO_PUBLIC_API_URL": "http://127.0.0.1:8000/"
+      }
+    },
+    "test": {
+      "env": {
+        "EXPO_PUBLIC_API_URL": "http://127.0.0.1:8000/"
+      }
+    },
     "preview": {
       "android": {
         "buildType": "apk"
@@ -15,7 +25,6 @@
     },
     "preview4": {
       "distribution": "internal"
-    },
-    "production": {}
+    }
   }
 }

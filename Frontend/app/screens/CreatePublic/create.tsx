@@ -1,63 +1,96 @@
-import React, { useState } from 'react';
-import { StackScreenProps } from '@react-navigation/stack';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Alert, FlatList, Image, Modal, TouchableOpacity, Switch, TextInput } from 'react-native';
+import { Button } from "react-native-paper";
+import { useTheme } from "@react-navigation/native";
+import { ProgressStep, ProgressSteps } from "@ouedraogof/react-native-progress-steps";
 import * as ImagePicker from 'expo-image-picker';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image, TextInput, Switch } from 'react-native';
-import {RootStackParamList} from "../../navigation/RootStackParamList";
+import MapView, { Marker, Region } from 'react-native-maps';
 import Header from "../../layout/Header";
 import Input from "../../components/Input/Input";
-import {Button} from "react-native-paper";
-import {useAuthStore} from "../../store/useAuthStore";
+import useLocation from "../../Hook/useLocation";
+import { Feather } from "@expo/vector-icons";
+import { FONTS } from "../../constants/theme";
 
-type CreatePublicationScreenProps = StackScreenProps<RootStackParamList, 'Create'>
+interface LocationDataItem {
+    key: string;
+    value: string;
+    coordinates: {
+        latitude: number;
+        longitude: number;
+    };
+}
 
-const CreatePublication  = ({ navigation }: CreatePublicationScreenProps) => {
+const CreatePublication: React.FC = () => {
+    const theme = useTheme();
+    const { colors } = theme;
 
-    const {
-        access
-    } = useAuthStore();
-    // Estado para los datos del formulario
     const [formData, setFormData] = useState({
-        title: '',
-        description: '',
-        age: '',
-        weight: '',
-        price: '',
-        active: false,
-        vaccinated: false,
-        for_sale: false,
-        birth_date: '',
-        last_parturition_date: '',
-        expected_parturition_date: '',
-        last_heat_date: '',
-        pregnancy_date: '',
-        days_of_pregnancy: '',
-        milk_production: '',
-        days_of_lactation: '',
-        brucellosis_application: false,
-        mother: '',
-        father: '',
-        comments: '',
-        breeds: '',
-        traits: ''
+        titulo: '',
+        descripcion: '',
+        precio: '',
+        sexo: '',
+        raza: '',
+        trazabilidad: false,
+        video_url: '',
+        usar_ubicacion_usuario: false,
     });
 
-    React.useEffect(() => {
-        (async () => {
-            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-            if (status !== 'granted') {
-                alert('Lo sentimos, necesitamos permisos de acceso a tu galería.');
-            }
-        })();
-    }, []);
+    const [images, setImages] = useState<string[]>([]);
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [latitude, setLatitude] = useState<number>(12.8654);
+    const [longitude, setLongitude] = useState<number>(-85.2072);
+    const [locationData, setLocationData] = useState<LocationDataItem[]>([]);
+    const [searchText, setSearchText] = useState<string>('');
 
-    const [images, setImages] = useState<string[]>([]); // Guardar varias imágenes
+    const { location } = useLocation();
 
-    // Manejo de cambios en los inputs
-    const handleInputChange = (name, value) => {
+    useEffect(() => {
+        console.log("==> location", location);
+        if (formData.usar_ubicacion_usuario && location) {
+            setLatitude(location.latitude);
+            setLongitude(location.longitude);
+        }
+    }, [formData.usar_ubicacion_usuario, location]);
+
+    const mapRegion: Region = {
+        latitude: latitude,
+        longitude: longitude,
+        latitudeDelta: 0.05,
+        longitudeDelta: 0.05,
+    };
+
+    useEffect(() => {
+        if (searchText.length >= 3) {
+            searchLocation(searchText);
+        }
+    }, [searchText]);
+
+    const searchLocation = async (input: string) => {
+        try {
+            const response = await fetch(
+                `https://nominatim.openstreetmap.org/search?format=json&q=${input}&addressdetails=1&limit=5&countrycodes=NI`
+            );
+            const locations = await response.json();
+
+            const searchResults: LocationDataItem[] = locations.map((location: any) => ({
+                key: location.place_id.toString(),
+                value: location.display_name,
+                coordinates: {
+                    latitude: parseFloat(location.lat),
+                    longitude: parseFloat(location.lon),
+                },
+            }));
+            setLocationData(searchResults);
+        } catch (error) {
+            console.error('Error fetching location data:', error);
+            Alert.alert('Error', 'No se pudo obtener datos de la ubicación.');
+        }
+    };
+
+    const handleInputChange = (name: keyof typeof formData, value: string | boolean) => {
         setFormData({ ...formData, [name]: value });
     };
 
-    // Selección de imágenes sin `allowsEditing`
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -66,312 +99,239 @@ const CreatePublication  = ({ navigation }: CreatePublicationScreenProps) => {
         });
 
         if (!result.canceled) {
-            const selectedImages = result.assets.map(asset => asset.uri);
-            setImages([...images, ...selectedImages]); // Agregar nuevas imágenes al estado
-        }
-    };
+            const selectedImages = result.assets.map((asset: any) => asset.uri);
+            const totalImages = [...images, ...selectedImages].slice(0, 9);
+            setImages(totalImages);
 
-    const handleSwitchChange = (name, value) => {
-        setFormData({ ...formData, [name]: value });
-    };
-
-    // Enviar los datos usando fetch
-    const submitForm = async () => {
-        const token = access; // Reemplaza esto con tu token JWT
-        const url = 'http://192.168.1.12:8000/create-cow/'; // URL de tu API
-        console.log("==> access", access);
-        try {
-            var data = new FormData();
-
-            // Añadir los datos del formulario a FormData
-            data.append('title', formData.title);
-            data.append('description', formData.description);
-            data.append('age', formData.age);
-            data.append('weight', formData.weight);
-            data.append('price', formData.price);
-            data.append('active', formData.active.toString()); // Booleanos como cadenas
-            data.append('vaccinated', formData.vaccinated.toString());
-            data.append('for_sale', formData.for_sale.toString());
-            data.append('birth_date', formData.birth_date);
-            data.append('last_parturition_date', formData.last_parturition_date);
-            data.append('expected_parturition_date', formData.expected_parturition_date);
-            data.append('last_heat_date', formData.last_heat_date);
-            data.append('pregnancy_date', formData.pregnancy_date);
-            data.append('days_of_pregnancy', formData.days_of_pregnancy);
-            data.append('milk_production', formData.milk_production);
-            data.append('days_of_lactation', formData.days_of_lactation);
-            data.append('brucellosis_application', formData.brucellosis_application.toString());
-            data.append('mother', formData.mother);
-            data.append('father', formData.father);
-            data.append('comments', formData.comments);
-
-            // Añadir las imágenes a FormData
-            images.forEach((imageUri, index) => {
-                const imageName = `image_${index}`;
-                const fileType = imageUri.split('.').pop();
-                data.append('images', {
-                    uri: imageUri,
-                    name: `${imageName}.${fileType}`,
-                    type: `image/${fileType}`,
-                });
-            });
-
-            const req = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'multipart/form-data'
-                },
-                body: data,
-            });
-
-            const response = await req.json();
-
-            if (req.ok) {
-                console.log('Respuesta del servidor:', response);
-            } else {
-                console.error('Error al crear la vaca:', response);
+            if (totalImages.length > 9) {
+                Alert.alert("Límite de imágenes", "Puedes seleccionar un máximo de 9 imágenes.");
             }
-        } catch (e) {
-            console.error('Error en el envío del formulario:', e);
         }
     };
 
+    const submitForm = () => {
+        Alert.alert("Publicación creada", "Tu publicación ha sido creada exitosamente.");
+    };
 
+    const buttonTextStyle = {
+        color: '#4CAF50',
+        fontWeight: 'bold' as const,
+    };
+
+    const activeStepStyles = {
+        activeStepIconBorderColor: '#4CAF50',
+        activeLabelColor: '#4CAF50',
+        activeStepNumColor: 'white',
+        activeStepIconColor: '#4CAF50',
+        completedStepIconColor: '#4CAF50',
+        completedProgressBarColor: '#4CAF50',
+        completedCheckColor: '#fff',
+    };
 
     return (
-        <ScrollView style={styles.container}>
-            <Header
-                title='Crear Publicacion'
-                leftIcon='back'
-                //titleLeft
-                rightIcon1={'search'}
-            />
-            <Text style={styles.headerText}>Crear Publicación</Text>
+        <View style={{ backgroundColor: colors.card, flex: 1 }}>
+            <Header title='Crear Venta' leftIcon='back' rightIcon1={'home'} />
+            <View style={{ flex: 1 }}>
+                <ProgressSteps {...activeStepStyles}>
+                    <ProgressStep label="Detalles Generales" nextBtnTextStyle={buttonTextStyle} previousBtnTextStyle={buttonTextStyle}>
+                        <View style={{ padding: 16 }}>
+                            <Text>Título</Text>
+                            <Input placeholder="Título" value={formData.titulo} onChangeText={(text) => handleInputChange('titulo', text)} />
+                            <Text>Descripción</Text>
+                            <Input placeholder="Descripción" value={formData.descripcion} onChangeText={(text) => handleInputChange('descripcion', text)} />
+                            <Text>Precio</Text>
+                            <Input placeholder="Precio" value={formData.precio} onChangeText={(text) => handleInputChange('precio', text)} />
+                            <Text>Sexo</Text>
+                            <View style={styles.optionContainer}>
+                                {['Hembra', 'Macho'].map(option => (
+                                    <TouchableOpacity
+                                        key={option}
+                                        style={[styles.optionButton, formData.sexo === option && styles.optionButtonSelected]}
+                                        onPress={() => handleInputChange('sexo', option)}
+                                    >
+                                        <Text style={formData.sexo === option ? styles.optionTextSelected : styles.optionText}>
+                                            {option}
+                                        </Text>
+                                    </TouchableOpacity>
+                                ))}
+                            </View>
+                            <Text>Raza</Text>
+                            <Input placeholder="Raza" value={formData.raza} onChangeText={(text) => handleInputChange('raza', text)} />
+                        </View>
+                    </ProgressStep>
 
-            {/* Sección de Imágenes */}
-            <View style={styles.imageSection}>
-                <Text style={styles.subHeaderText}>Imagen de publicación</Text>
-                <View style={styles.imageUpload}>
-                    <Button onPress={pickImage} >Seleccionar imágenes</Button>
+                    <ProgressStep label="Configuración Adicional" nextBtnTextStyle={buttonTextStyle} previousBtnTextStyle={buttonTextStyle}>
+                        <View style={{ padding: 16 }}>
+                            <View>
+                                <Text>Configurar Trazabilidad</Text>
+                                <Switch value={formData.trazabilidad} onValueChange={(value) => handleInputChange('trazabilidad', value)} />
+                            </View>
+                            <View>
+                                <Text>Usar Coordenadas del Usuario</Text>
+                                <Switch value={formData.usar_ubicacion_usuario} onValueChange={(value) => handleInputChange('usar_ubicacion_usuario', value)} />
+                            </View>
+                            <View>
+                                <Text>URL del Video</Text>
+                                <Input placeholder="Enlace del video" value={formData.video_url} onChangeText={(text) => handleInputChange('video_url', text)} />
+                            </View>
+                            <View>
+                                <Text style={{ marginTop: 20 }}>Imágenes</Text>
+                                <Button onPress={pickImage} mode="contained" style={{ marginVertical: 10, backgroundColor: '#4CAF50'}}>
+                                    Seleccionar imágenes
+                                </Button>
+                                <FlatList
+                                    horizontal
+                                    data={images}
+                                    keyExtractor={(item, index) => index.toString()}
+                                    renderItem={({ item, index }) => (
+                                        <TouchableOpacity onPress={() => setSelectedImage(item)}>
+                                            <Image source={{ uri: item }} style={styles.selectedImage} />
+                                            <TouchableOpacity style={styles.deleteButton} onPress={() => setImages(images.filter((_, i) => i !== index))}>
+                                                <Text style={{ color: 'white', fontWeight: 'bold' }}>X</Text>
+                                            </TouchableOpacity>
+                                        </TouchableOpacity>
+                                    )}
+                                />
+                            </View>
+                        </View>
+                    </ProgressStep>
+
+                    <ProgressStep label="Mapa" nextBtnTextStyle={buttonTextStyle} previousBtnTextStyle={buttonTextStyle}>
+                        <View style={{ padding: 16 }}>
+                            <View style={styles.searchContainer}>
+                                <Feather name="search" size={20} color={colors.title} />
+                                <TextInput
+                                    style={styles.searchInput}
+                                    placeholder="Buscar ubicación..."
+                                    value={searchText}
+                                    onChangeText={setSearchText}
+                                />
+                            </View>
+                            <FlatList
+                                data={locationData}
+                                keyExtractor={(item) => item.key.toString()}
+                                renderItem={({ item }) => (
+                                    <TouchableOpacity onPress={() => {
+                                        setSearchText(item.value);
+                                        setLatitude(item.coordinates.latitude);
+                                        setLongitude(item.coordinates.longitude);
+                                    }}>
+                                        <Text style={styles.listItem}>{item.value}</Text>
+                                    </TouchableOpacity>
+                                )}
+                            />
+                            <View style={styles.mapPlaceholder}>
+                                <MapView style={StyleSheet.absoluteFillObject} region={mapRegion}>
+                                    <Marker coordinate={{ latitude: mapRegion.latitude, longitude: mapRegion.longitude }} />
+                                </MapView>
+                            </View>
+                        </View>
+                    </ProgressStep>
+
+                    <ProgressStep label="Confirmación" onSubmit={submitForm} nextBtnTextStyle={buttonTextStyle} previousBtnTextStyle={buttonTextStyle}>
+                        <View style={{ alignItems: 'center', padding: 16 }}>
+                            <Text>Revisa tus datos y envía la publicación</Text>
+                        </View>
+                    </ProgressStep>
+                </ProgressSteps>
+            </View>
+
+            <Modal visible={!!selectedImage} transparent={true}>
+                <View style={styles.modalContainer}>
+                    <TouchableOpacity style={styles.modalCloseButton} onPress={() => setSelectedImage(null)}>
+                        <Text style={styles.modalCloseText}>Cerrar</Text>
+                    </TouchableOpacity>
+                    {selectedImage && <Image source={{ uri: selectedImage }} style={styles.fullScreenImage} />}
                 </View>
-                <ScrollView horizontal>
-                    {images.map((imageUri, index) => (
-                        <Image key={index} source={{ uri: imageUri }} style={styles.selectedImage} />
-                    ))}
-                </ScrollView>
-            </View>
-
-            {/* Inputs para los campos del formulario */}
-            <Input
-                label="Nombre"
-                placeholder="Ingresa el nombre"
-                value={formData.title}
-                onChangeText={(text) => handleInputChange('title', text)}
-            />
-
-            <Input
-                label="Descripción"
-                placeholder="Descripción"
-                value={formData.description}
-                onChangeText={(text) => handleInputChange('description', text)}
-            />
-
-            <Input
-                label="Edad"
-                placeholder="Edad"
-                keyboardType="numeric"
-                value={formData.age}
-                onChangeText={(text) => handleInputChange('age', text)}
-            />
-
-            <Input
-                label="Peso"
-                placeholder="Peso"
-                keyboardType="numeric"
-                value={formData.weight}
-                onChangeText={(text) => handleInputChange('weight', text)}
-            />
-
-            <Input
-                label="Precio"
-                placeholder="Precio"
-                keyboardType="numeric"
-                value={formData.price}
-                onChangeText={(text) => handleInputChange('price', text)}
-            />
-
-            {/* Switches para los campos booleanos */}
-            <View style={styles.switchContainer}>
-                <Text>¿Activo?</Text>
-                <Switch
-                    value={formData.active}
-                    onValueChange={(value) => handleSwitchChange('active', value)}
-                />
-            </View>
-
-            <View style={styles.switchContainer}>
-                <Text>¿Vacunado?</Text>
-                <Switch
-                    value={formData.vaccinated}
-                    onValueChange={(value) => handleSwitchChange('vaccinated', value)}
-                />
-            </View>
-
-            <View style={styles.switchContainer}>
-                <Text>¿En venta?</Text>
-                <Switch
-                    value={formData.for_sale}
-                    onValueChange={(value) => handleSwitchChange('for_sale', value)}
-                />
-            </View>
-
-            {/* Fechas */}
-            <Input
-                label="Fecha de nacimiento"
-                placeholder="YYYY-MM-DD"
-                value={formData.birth_date}
-                onChangeText={(text) => handleInputChange('birth_date', text)}
-            />
-
-            <Input
-                label="Último parto"
-                placeholder="YYYY-MM-DD"
-                value={formData.last_parturition_date}
-                onChangeText={(text) => handleInputChange('last_parturition_date', text)}
-            />
-
-            <Input
-                label="Fecha esperada de parto"
-                placeholder="YYYY-MM-DD"
-                value={formData.expected_parturition_date}
-                onChangeText={(text) => handleInputChange('expected_parturition_date', text)}
-            />
-
-            <Input
-                label="Último celo"
-                placeholder="YYYY-MM-DD"
-                value={formData.last_heat_date}
-                onChangeText={(text) => handleInputChange('last_heat_date', text)}
-            />
-
-            <Input
-                label="Fecha de preñez"
-                placeholder="YYYY-MM-DD"
-                value={formData.pregnancy_date}
-                onChangeText={(text) => handleInputChange('pregnancy_date', text)}
-            />
-
-            <Input
-                label="Días de preñez"
-                placeholder="Días de preñez"
-                keyboardType="numeric"
-                value={formData.days_of_pregnancy}
-                onChangeText={(text) => handleInputChange('days_of_pregnancy', text)}
-            />
-
-            <Input
-                label="Producción de leche (L)"
-                placeholder="Producción de leche"
-                keyboardType="numeric"
-                value={formData.milk_production}
-                onChangeText={(text) => handleInputChange('milk_production', text)}
-            />
-
-            <Input
-                label="Días de lactancia"
-                placeholder="Días de lactancia"
-                keyboardType="numeric"
-                value={formData.days_of_lactation}
-                onChangeText={(text) => handleInputChange('days_of_lactation', text)}
-            />
-
-            <View style={styles.switchContainer}>
-                <Text>¿Aplicación de brucelosis?</Text>
-                <Switch
-                    value={formData.brucellosis_application}
-                    onValueChange={(value) => handleSwitchChange('brucellosis_application', value)}
-                />
-            </View>
-
-            <Input
-                label="ID de la madre"
-                placeholder="ID de la madre"
-                value={formData.mother}
-                onChangeText={(text) => handleInputChange('mother', text)}
-            />
-
-            <Input
-                label="Nombre del padre"
-                placeholder="Nombre del padre"
-                value={formData.father}
-                onChangeText={(text) => handleInputChange('father', text)}
-            />
-
-            <Input
-                label="Comentarios"
-                placeholder="Comentarios adicionales"
-                value={formData.comments}
-                onChangeText={(text) => handleInputChange('comments', text)}
-            />
-
-            {/* Botón para enviar el formulario */}
-            <TouchableOpacity style={styles.submitButton} onPress={submitForm}>
-                <Text style={styles.submitButtonText}>Crear Publicación</Text>
-            </TouchableOpacity>
-
-        </ScrollView>
+            </Modal>
+        </View>
     );
 };
-
 const styles = StyleSheet.create({
-    container: {
+    optionContainer: {
+        flexDirection: 'row',
+        marginVertical: 10,
+    },
+    optionButton: {
         flex: 1,
-        backgroundColor: 'white',
-        padding: 16,
-    },
-    headerText: {
-        fontSize: 20,
-        fontWeight: '600',
-        marginTop: 20,
-    },
-    imageSection: {
-        marginTop: 20,
-    },
-    subHeaderText: {
-        fontSize: 16,
-        color: '#62676C',
-    },
-    imageUpload: {
-        marginTop: 10,
-        padding: 20,
-        borderWidth: 1,
-        borderStyle: 'dotted',
-        borderColor: '#9C9CA3',
+        padding: 10,
         alignItems: 'center',
+        borderRadius: 4,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        marginRight: 5,
+    },
+    optionButtonSelected: {
+        backgroundColor: '#4CAF50',
+        borderColor: '#4CAF50',
+    },
+    optionText: {
+        color: '#333',
+    },
+    optionTextSelected: {
+        color: '#fff',
     },
     selectedImage: {
         width: 100,
         height: 100,
         marginRight: 10,
+        borderRadius: 8,
     },
-    switchContainer: {
+    deleteButton: {
+        position: 'absolute',
+        top: 5,
+        right: 5,
+        backgroundColor: 'red',
+        borderRadius: 12,
+        padding: 4,
+    },
+    searchContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
+        borderBottomWidth: 1,
+        borderColor: '#ccc',
+        paddingHorizontal: 8,
         marginVertical: 10,
     },
-    submitButton: {
-        backgroundColor: '#28a745',
-        padding: 15,
-        borderRadius: 5,
-        alignItems: 'center',
-        marginTop: 20,
-        marginBottom: 20
+    searchInput: {
+        flex: 1,
+        padding: 8,
     },
-    submitButtonText: {
-        color: '#fff',
+    listItem: {
+        paddingVertical: 10,
+        borderBottomWidth: 1,
+        borderColor: '#ccc',
+    },
+    mapPlaceholder: {
+        height: 400,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 8,
+        overflow: 'hidden',
+        marginVertical: 15,
+    },
+    modalContainer: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalCloseButton: {
+        position: 'absolute',
+        top: 40,
+        right: 20,
+        backgroundColor: 'red',
+        padding: 10,
+        borderRadius: 5,
+    },
+    modalCloseText: {
+        color: 'white',
         fontSize: 16,
+    },
+    fullScreenImage: {
+        width: '90%',
+        height: '70%',
+        resizeMode: 'contain',
     },
 });
 

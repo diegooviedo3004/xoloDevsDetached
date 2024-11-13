@@ -84,7 +84,8 @@ const Cardstyle4 = ({id,title,image,countnumber,price,onPress,brand,product,onPr
                         justifyContent:'center',
                         gap:10,
                         position:'absolute',
-                        top: "160px"
+                        top: 150,
+                        left: 7,
                     }}
                 >
                         <Image
@@ -95,14 +96,13 @@ const Cardstyle4 = ({id,title,image,countnumber,price,onPress,brand,product,onPr
                 </View>
             <View
                 style={{
-                    paddingRight:product ? 10 : 0
+                    paddingRight:product ? 10 : 0,
+                    padding: 2,
+                    width: "100%",
+                    marginBottom: 20
                 }}
             >
-                <View>
-                    <Text style={{...FONTS.fontMedium,fontSize:16,color:colors.title,paddingRight:40}}>{title}</Text>
-                    <Text style={{...FONTS.fontRegular,fontSize:12,color:theme.dark ? 'rgba(255,255,255,.7)':'#6A6A6A',marginTop:5}}>{brand}</Text>
-                </View>
-                <View style={[GlobalStyleSheet.flex,{marginTop:0}]}>
+                <View style={[GlobalStyleSheet.flex,{marginTop:10}]}>
                     <Text style={{...FONTS.fontSemiBold,fontSize:18,color:colors.title}}>{price}</Text>
                     {/* {product ?
                         <TouchableOpacity
@@ -163,6 +163,13 @@ const Cardstyle4 = ({id,title,image,countnumber,price,onPress,brand,product,onPr
                             <Text style={{...FONTS.fontMedium,fontSize:18,color:COLORS.primary}}>{countnumber}</Text>
                     }*/}
                 </View>
+
+                <View>
+                    <Text style={{...FONTS.fontMedium,fontSize:16,color:colors.title,paddingRight:40}}>{title}</Text>
+                </View>
+                <View>
+                    <Text style={{...FONTS.fontRegular,fontSize:14,color:'#9A9A9A',paddingRight:40}}>San Marcos</Text>
+                </View>
                 {Myorder ?
                     null
                     :
@@ -171,6 +178,7 @@ const Cardstyle4 = ({id,title,image,countnumber,price,onPress,brand,product,onPr
                             position:'absolute',
                             right:0,
                             top:0,
+                            marginTop:9,
                         }}
                     >
                         <LikeBtn

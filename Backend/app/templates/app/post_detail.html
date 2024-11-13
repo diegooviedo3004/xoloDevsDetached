@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+
+
+<section class="product-details py-80">
+    <div class="container container-lg">
+        <div class="row gy-4">
+            <div class="col-lg-12">
+                <div class="row gy-4">
+                    <div class="col-xl-6">
+                        <div class="product-details__left">
+                            <div class="product-details__thumb-slider border border-gray-100 rounded-16">
+                                {% for image in post.images.all %}
+                                <div>
+                                    <div class="product-details__thumb flex-center h-100">
+                                        <img src="https:/{{ image.image }}" alt="{{ post.title }}">
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="mt-24">
+                                <div class="product-details__images-slider">
+                                    {% for image in post.images.all %}
+                                    <div>
+                                        <div class="max-w-120 max-h-120 h-100 flex-center border border-gray-100 rounded-16 p-8">
+                                            <img src="https:/{{ image.image }}" alt="{{ post.title }}">
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-6">
+                        <div class="product-details__content">
+                            <h5 class="mb-12">{{ post.title }}</h5>
+                            <div class="flex-align gap-4">
+                                <span class="text-main-600 text-md d-flex"><i class="ph-fill ph-storefront"></i></span>
+                                <span class="text-gray-500 text-xs">Por {{ post.user.get_full_name }}</span>
+                            </div>
+                            <div class="flex-align gap-4">
+                                <span class="text-main-600 text-md d-flex"><i class="ph-fill ph-map-pin-line"></i></span>
+                                <span class="text-gray-500 text-xs"> {{ post.location }}</span>
+                            </div>
+
+                            <span class="mt-32 pt-32 text-gray-700 border-top border-gray-100 d-block"></span>
+
+                            <p class="text-gray-700">
+                                {{ post.description }}
+                            </p>
+
+                            <div class="mt-32 flex-align flex-wrap gap-32">
+                                <div class="flex-align gap-8">
+                                    <h4 class="mb-0">${{ post.starting_price }}</h4>
+                                </div>
+                                <a href="#" class="btn btn-main rounded-pill">Contactar por chat</a>
+                            </div>
+                    
+                            <span class="mt-32 pt-32 text-gray-700 border-top border-gray-100 d-block"></span>
+
+                            {% if post.traceability %}
+                            <div class="mt-32">
+                                <h6 class="fw-bold text-gray-900">Información de Trazabilidad</h6>
+                                <ul class="text-gray-700">
+                                    <li>Número de identificación: 12345</li> <!-- Ejemplo de datos específicos de trazabilidad -->
+                                    <li>Fecha de nacimiento: 15/03/2021</li>
+                                    <li>Última vacuna: 20/05/2023</li>
+                                </ul>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+    <!-- ========================== Similar Product Start ============================= -->
+<!-- <section class="new-arrival pb-80">
+    <div class="container container-lg">
+        <div class="section-heading">
+            <div class="flex-between flex-wrap gap-8">
+                <h5 class="mb-0">You Might Also Like</h5>
+                <div class="flex-align gap-16">
+                    <a href="shop.html" class="text-sm fw-medium text-gray-700 hover-text-main-600 hover-text-decoration-underline">All Products</a>
+                    <div class="flex-align gap-8">
+                        <button type="button" id="new-arrival-prev" class="slick-prev slick-arrow flex-center rounded-circle border border-gray-100 hover-border-main-600 text-xl hover-bg-main-600 hover-text-white transition-1" >
+                            <i class="ph ph-caret-left"></i>
+                        </button>
+                        <button type="button" id="new-arrival-next" class="slick-next slick-arrow flex-center rounded-circle border border-gray-100 hover-border-main-600 text-xl hover-bg-main-600 hover-text-white transition-1" >
+                            <i class="ph ph-caret-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="new-arrival__slider arrow-style-two">
+            {% for post in posts %}
+            <div class="col-xxl-2 col-lg-3 col-sm-4 col-6" data-aos="fade-up" data-aos-duration="200">
+                <div class="product-card h-100 p-8 border border-gray-100 hover-border-main-600 rounded-16 position-relative transition-2">
+                    <a href="{% url 'post_detail' post.id %}" class="product-card__thumb flex-center">
+                        <img src="https://www.tn8.tv/wp-content/uploads/2021/04/ganaderia-nicaragua-05.jpg" alt="Ganado en Venta">
+                    </a>
+                    <div class="product-card__content p-sm-2 w-100">
+                        <h6 class="title text-lg fw-semibold mt-12 mb-8">
+                            <a href="{% url 'post_detail' post.id %}" class="link text-line-2">{{ post.title }} - {{ post.weight }}</a>
+                        </h6>
+                        <div class="flex-align gap-4">
+                            <span class="text-main-600 text-md d-flex"><i class="ph-fill ph-storefront"></i></span>
+                            <span class="text-gray-500 text-xs">Por {{ post.user.get_full_name }}</span>
+
+                        </div>
+                        <div class="flex-align gap-4">
+                            <span class="text-main-600 text-md d-flex"><i class="ph-fill ph-map-pin-line"></i></span>
+                            <span class="text-gray-500 text-xs"> {{ post.location }}</span>
+                        </div>
+
+                        <div class="product-card__content mt-12">
+                            <div class="product-card__price mb-8">
+                                <span class="text-heading text-md fw-semibold ">${{ post.starting_price }}  </span>
+                            </div>
+
+                            <a href="{% url 'post_detail' post.id %}" class="product-card__cart btn bg-main-50 text-main-600 hover-bg-main-600 hover-text-white py-11 px-24 rounded-pill flex-align gap-8 mt-24 w-100 justify-content-center">
+                                Ver publicación <i class="ph ph-eye"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+        </div>
+    </div>
+ </section> -->
+<!-- ========================== Similar Product End ============================= -->
+    
+    <!-- ========================== Shipping Section Start ============================ -->
+    <section class="shipping mb-24" id="shipping">
+        <div class="container container-lg">
+            <div class="row gy-4">
+                <div class="col-xxl-3 col-sm-6" data-aos="zoom-in" data-aos-duration="400">
+                    <div class="shipping-item flex-align gap-16 rounded-16 bg-main-50 hover-bg-main-100 transition-2">
+                        <span class="w-56 h-56 flex-center rounded-circle bg-main-600 text-white text-32 flex-shrink-0"><i class="ph-fill ph-thumbs-up"></i></span>
+                        <div class="">
+                            <h6 class="mb-0">Calidad Garantizada</h6>
+                            <span class="text-sm text-heading">Solo el mejor ganado para nuestros clientes</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xxl-3 col-sm-6" data-aos="zoom-in" data-aos-duration="600">
+                    <div class="shipping-item flex-align gap-16 rounded-16 bg-main-50 hover-bg-main-100 transition-2">
+                        <span class="w-56 h-56 flex-center rounded-circle bg-main-600 text-white text-32 flex-shrink-0"><i class="ph-fill ph-handshake"></i></span>
+                        <div class="">
+                            <h6 class="mb-0">Confianza y Seguridad</h6>
+                            <span class="text-sm text-heading">Conexiones directas entre compradores y vendedores</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xxl-3 col-sm-6" data-aos="zoom-in" data-aos-duration="800">
+                    <div class="shipping-item flex-align gap-16 rounded-16 bg-main-50 hover-bg-main-100 transition-2">
+                        <span class="w-56 h-56 flex-center rounded-circle bg-main-600 text-white text-32 flex-shrink-0"><i class="ph-fill ph-seal-check"></i></span>
+                        <div class="">
+                            <h6 class="mb-0">Lotes Certificados</h6>
+                            <span class="text-sm text-heading">Seleccionados por su salud y genética</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xxl-3 col-sm-6" data-aos="zoom-in" data-aos-duration="1000">
+                    <div class="shipping-item flex-align gap-16 rounded-16 bg-main-50 hover-bg-main-100 transition-2">
+                        <span class="w-56 h-56 flex-center rounded-circle bg-main-600 text-white text-32 flex-shrink-0"><i class="ph-fill ph-headset"></i></span>
+                        <div class="">
+                            <h6 class="mb-0">Soporte 24/7</h6>
+                            <span class="text-sm text-heading">Atención continua para tus necesidades</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+<!-- ========================== Shipping Section End ============================ -->
+
+{% endblock content %}
+    

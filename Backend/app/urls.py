@@ -1,16 +1,25 @@
+from . import views
 from django.urls import path, include
-from .views import RegisterView, LoginView, UserProfileView, CreateCowView
 from rest_framework.routers import DefaultRouter
+from .views import PostViewSet, IndexView, ContactView, CreatePostView, PostCreateView, PostsByUser, PostDetailView
+from django.conf import settings
+from django.conf.urls.static import static
 
 router = DefaultRouter()
+router.register(r'posts', PostViewSet)
 
 urlpatterns = [
-    path('register/', RegisterView.as_view(), name='register'),
-    path('login/', LoginView.as_view(), name='login'),
-    path('profile/<int:user_id>/', UserProfileView.as_view(), name='user-profile'),
-    path('create-cow/', CreateCowView.as_view(), name='create-cow'),
+    # web
+    path('', IndexView.as_view(), name="home"),
+    path('new/post/', PostCreateView.as_view(), name="create_post"),
+    path('post/<int:pk>/', PostDetailView.as_view(), name='post_detail'),
+    path('contact/', ContactView.as_view(), name="contact"),
 
+
+    # mobile
+    path('user/posts/<int:user_id>/', PostsByUser.as_view(), name="user-posts"),
     path('', include(router.urls)),
-    # path('update-profile-picture/', ProfilePictureUpdateView.as_view(), name='update-profile-picture'),
-
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

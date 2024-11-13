@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+<section class="account py-80">
+  <div class="container container-lg">
+    <form method="post" action="{% url 'login' %}">
+      {% csrf_token %}
+      <div class="row gy-4 justify-content-center">
+        <div class="col-xl-6 pe-xl-5 my-5">
+          <div class="border border-gray-100 hover-border-main-600 transition-1 rounded-16 px-24 py-40 h-100">
+            <h6 class="text-xl mb-32">Iniciar sesión</h6>
+            
+            <!-- Campo de Correo Electrónico -->
+            <div class="mb-24">
+              <label for="id_username" class="text-neutral-900 text-lg mb-8 fw-medium">Correo electrónico <span class="text-danger">*</span></label>
+              {% render_field form.username class="common-input" id="id_username" placeholder="Ingresa el correo electrónico" %}
+            </div>
+
+            <!-- Campo de Contraseña -->
+            <div class="mb-24">
+              <label for="id_password" class="text-neutral-900 text-lg fw-medium">Contraseña</label>
+              <div class="position-relative">
+                {% render_field form.password class="common-input" id="id_password" placeholder="Ingresa la contraseña" %}
+                <span class="toggle-password position-absolute top-50 inset-inline-end-0 me-16 translate-middle-y cursor-pointer ph ph-eye-slash" id="#password"></span>
+              </div>
+            </div>
+
+            <!-- Enlace de Olvidaste tu contraseña -->
+            <div class="">
+              <a href="{% url 'password_reset' %}" class="text-danger-600 text-sm fw-semibold hover-text-decoration-underline">¿Olvidaste tu contraseña?</a>
+            </div>
+
+            <!-- Botón de Inicio de Sesión -->
+            <div class="mb-24 mt-12">
+              <div class="flex-align gap-48 flex-wrap">
+                <button type="submit" class="btn btn-main py-18 px-40">Iniciar sesión</button>
+              </div>
+            </div>
+
+            <!-- Enlace de Registro -->
+            <div class="mt-24">
+              <span class="text-sm fw-semibold">¿No tienes una cuenta?</span>
+              <a href="{% url 'signup' %}" class="text-success-600 text-sm fw-bold hover-text-decoration-underline">Regístrate</a>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

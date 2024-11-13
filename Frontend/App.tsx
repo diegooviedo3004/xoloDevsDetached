@@ -6,6 +6,9 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { Provider } from 'react-redux'
 import store from './app/redux/store';
+import React from 'react';
+import {Platform} from "react-native";
+import {COLORS} from "./app/constants/theme";
 
 export default function App() {
   
@@ -30,8 +33,8 @@ export default function App() {
         <SafeAreaView
           style={{
             flex: 1,
-            //paddingTop: Platform.OS === 'android' ? 25 : 0,
-            //backgroundColor:COLORS.primary ,
+            paddingTop: Platform.OS === 'android' ? 25 : 0,
+            // backgroundColor:COLORS.primary ,
           }}>
             <StatusBar style="dark" />
             <Provider store={store}>
