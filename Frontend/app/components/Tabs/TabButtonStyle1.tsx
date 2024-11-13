@@ -34,7 +34,7 @@ const TabButtonStyle1 = ({ buttons, onClick, scrollX } : Props) => {
                     key={btn}
                     style={styles.btn}
                     onPress={() => onClick(i)}>
-                    <Text style={{...FONTS.font,...FONTS.fontMedium,color:colors.text}}>{btn}</Text>
+                    <Text style={{...FONTS.font,...FONTS.fontMedium,color:colors.text, fontSize: 16}}>{btn}</Text>
                 </TouchableOpacity>
             ))}
             <Animated.View
@@ -50,7 +50,7 @@ const TabButtonStyle1 = ({ buttons, onClick, scrollX } : Props) => {
                             styles.animatedBtn,
                             { width: btnWidth, transform: [{ translateX: translateXOpposit }] },
                         ]}>
-                        <Text style={{...FONTS.font,...FONTS.fontMedium,color:COLORS.primary}}>{btn}</Text>
+                        <Text style={{...FONTS.font,...FONTS.fontMedium,color:COLORS.primary, fontSize: 16}}>{btn}</Text>
                         <View
                           style={{
                             height:3,
@@ -92,6 +92,7 @@ const styles = StyleSheet.create({
     btnTextActive: {
         color: '#fff',
         fontWeight: 'bold',
+
     },
 })
 
