@@ -1,5 +1,5 @@
 import { useTheme } from '@react-navigation/native';
-import React, { useState } from 'react'
+import React, {useEffect, useState} from 'react'
 import { View, Text,Image, TouchableOpacity, StyleSheet, Platform } from 'react-native'
 import { IMAGES } from '../../constants/Images';
 import { GlobalStyleSheet } from '../../constants/StyleSheet';
@@ -13,6 +13,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addToCart } from '../../redux/reducer/cartReducer';
 import Swiper from 'react-native-swiper/src';
 import { Feather } from '@expo/vector-icons';
+import Tabs from "../Components/Tabs";
+import {usePostStore} from "../../store/usePostStore";
+import {useAuthStore} from "../../store/useAuthStore";
+import {useChatStore} from "../../store/useChatStore";
 
 
 const ItemImages = [IMAGES.vacasCards1, IMAGES.vacasCards1, IMAGES.vacasCards1];
@@ -21,7 +25,8 @@ type ProductsDetailsScreenProps = StackScreenProps<RootStackParamList, 'Products
 
 const ProductsDetails = ({navigation} : ProductsDetailsScreenProps) => {
 
-
+    const  { activePost, startSetActivePost, startSetActiveTraceability, activeTraceability } = usePostStore()
+    const { startSetActiveChat } = useChatStore()
     const theme = useTheme();
     const { colors } : {colors : any} = theme;
 
@@ -37,8 +42,16 @@ const ProductsDetails = ({navigation} : ProductsDetailsScreenProps) => {
         } as any ));
     }
 
+    useEffect(() => {
+        startSetActiveTraceability(activePost.id)
+    }, []);
+
+    console.log(activeTraceability)
+
+
+    console.log(activePost)
     return (
-       <View style={{backgroundColor:colors.background,flex:1}}>
+        <View style={{backgroundColor:colors.background,flex:1}}>
             <ScrollView contentContainerStyle={{flexGrow:1}}>
                 <View
                     style={[styles.imagecard,]}
@@ -49,7 +62,7 @@ const ProductsDetails = ({navigation} : ProductsDetailsScreenProps) => {
                         showsPagination={Platform.OS === "android" ? false : false}
                         loop={false}
                     >
-                        {ItemImages.map((data, index) => (
+                        {activePost?.images.map((data, index) => (
                             <View
                                 key={index}
                             >
@@ -59,7 +72,7 @@ const ProductsDetails = ({navigation} : ProductsDetailsScreenProps) => {
                                         width: '100%',
                                         resizeMode:'contain'
                                     }}
-                                    source={data}
+                                    src={data.image}
                                 />
                             </View>
                         ))}
@@ -71,14 +84,14 @@ const ProductsDetails = ({navigation} : ProductsDetailsScreenProps) => {
                             onPress={() => navigation.goBack()}
                             style={[styles.backbtn,{backgroundColor:'rgba(246,246,246,.3)'}]}
                         >
-                                <Feather size={24} color={COLORS.card} name={'arrow-left'} />
+                            <Feather size={24} color={COLORS.card} name={'arrow-left'} />
                         </TouchableOpacity>
                         <Text style={{...FONTS.fontSemiBold,fontSize:20,color:COLORS.card}}>Detalles</Text>
                         <TouchableOpacity
-                             onPress={() => {addItemToCart(); navigation.navigate('MyCart')}}
+                            onPress={() => {addItemToCart(); navigation.navigate('MyCart')}}
                             style={[styles.backbtn,{backgroundColor:'rgba(246,246,246,.3)'}]}
                         >
-                                <Feather size={20} color={COLORS.card} name={'shopping-cart'} />
+                            <Feather size={20} color={COLORS.card} name={'shopping-cart'} />
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -90,45 +103,31 @@ const ProductsDetails = ({navigation} : ProductsDetailsScreenProps) => {
                                     height:6,
                                     width:60,
                                     borderRadius:20,
-                                    backgroundColor:'#DDDDDD'
+                                    backgroundColor:'#DDDDDD',
+
                                 }}
                             />
+                            <Tabs />
+
                         </View>
                         <View
                             style={[styles.rattingcard]}
                         >
                             <Text style={{...FONTS.fontSemiBold,fontSize:24,color:COLORS.card,lineHeight:34}}>4.5</Text>
                         </View>
-                        <Text style={[styles.brandTitle,{color:colors.title}]}>Guernsey</Text>
-                        <Text style={[styles.subtitle,{color:theme.dark ? 'rgba(255,255,255,.7)':'#4E4E4E',paddingVertical:15}]}>“En venta, ofrecemos una vaca de raza Guernsey con trazabilidad completa y garantizada. Esta vaca cuenta con un seguimiento exhaustivo desde su nacimiento, garantizando su origen, estado de salud y alimentación controlada. {"\n"}Se garantiza libre de mastitis y otras afecciones que puedan afectar su productividad.
-                            Movimientos: Todos los movimientos de la vaca han sido registrados, facilitando la trazabilidad en caso de inspección o para satisfacer los estándares de exportación.</Text>
-                        <View style={[GlobalStyleSheet.flex,{paddingVertical:15}]}>
-                            <View
-                                style={{
-                                    flexDirection:'row',
-                                    alignItems:'center',
-                                    gap:10
-                                }}
-                            >
-                                <View style={{flexDirection:'row', gap:5 }}>
-                                    <Text style={[styles.subtitle2,{fontSize:14,color:colors.title}]}>$</Text>
-                                    <Text style={[styles.subtitle2,{color:colors.title,lineHeight:30}]}>$1200</Text>
-                                </View>
-                                <Text style={{...FONTS.fontMedium,fontSize:16,color:'#9A9A9A'}}>$2200</Text>
-                            </View>
-                            <View>
-                                <CheckoutItems
-                                    productList={true}
-                                />
-                            </View>
-                        </View>
-                        <Text style={{...FONTS.fontLight,fontSize:12,color:theme.dark ? 'rgba(255,255,255,.7)':'#4E4E4E',marginTop:5}}> Alimentación: Alimentada con una dieta equilibrada y controlada, lo que asegura que produce leche rica en grasa y beta-caroteno, característica distintiva de la leche de vaca Guernsey. Todos los detalles de su alimentación están documentados para garantizar la máxima calidad de la leche.</Text>
+
                     </View>
                 </View>
             </ScrollView>
             <View style={[GlobalStyleSheet.container,{paddingTop:0,}]}>
                 <Button
-                    onPress={() => navigation.navigate('Singlechat')}
+                    onPress={async () => {
+                        await startSetActiveChat(activePost.user_id);
+                        setTimeout(() => {
+
+                            navigation.navigate('Singlechat', { presetMessage: `Hola, estoy interesado en tu publicación: "${activePost?.title} | ${activePost?.description}"` })
+                        }, 100)
+                    }}
                     title='Contactar'
                     color={COLORS.primary}
                     text={COLORS.card}
@@ -141,7 +140,7 @@ const ProductsDetails = ({navigation} : ProductsDetailsScreenProps) => {
                     style={{ marginTop: 5 , borderRadius:50, backgroundColor:COLORS.card, borderStyle: "solid",  borderWidth: 1, borderColor:COLORS.primary}}
                 />
             </View>
-       </View>
+        </View>
     )
 }
 
@@ -206,7 +205,7 @@ const styles = StyleSheet.create({
         elevation: 8,
         position:'absolute',
         right:40,
-        top:-25, 
+        top:-25,
     },
     subtitle:{
         ...FONTS.fontRegular,

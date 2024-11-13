@@ -109,9 +109,9 @@ class Post(TimeStampedModel):
     title = models.CharField(max_length=100)
     description = models.TextField()
     sex = models.CharField(max_length=10, choices=SEX_CHOICES)
-    
+
     breed = models.CharField(max_length=20, choices=BREED_CHOICES, default='Others')
-    
+
     location = models.CharField(max_length=300)
 
     lat = models.TextField()
@@ -123,7 +123,7 @@ class Post(TimeStampedModel):
     lot = models.BooleanField(default=False, blank=True)
     post_type = models.CharField(choices=POST_CHOICES, max_length=50, default='Post')
     video_url = models.URLField(blank=True, null=True)
-    is_approved = models.BooleanField(default=False) 
+    is_approved = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
 
     def _str_(self):

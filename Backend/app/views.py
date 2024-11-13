@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from rest_framework import generics
+from rest_framework import generics, status, viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -8,10 +8,22 @@ from django.views.generic import CreateView, TemplateView, ListView, DetailView
 #from .forms import PostForm
 from django.urls import reverse_lazy
 from rest_framework.viewsets import ModelViewSet
-from .models import Post, PostImage, Auction
-from .serializers import PostSerializer, PostsByUserSerializer
+from .models import Post, PostImage, Auction, Post, Promotion, Traceability, ReproductiveData,DairyCowData
+from .serializers import PostSerializer, TraceabilitySerializer, DairyCowDataSerializer, ReproductiveDataSerializer
 from django.contrib.auth import get_user_model
 from .forms import PostForm, PostImageForm, TraceabilityForm, PostImageForm, DairyCowDataForm, ReproductiveDataForm
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+from rest_framework.views import APIView
+
+from django.http import JsonResponse, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from .models import Promotion
+from django.conf import settings
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.conf import settings
+
+import stripe
 
 User = get_user_model()
 class IndexView(ListView):
@@ -19,13 +31,14 @@ class IndexView(ListView):
     template_name = "app/index.html"
     context_object_name = 'posts'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['users'] = User.objects.all()  # Añade todos los usuarios al contexto
-        return context
+# Mobile
+class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
+    parser_classes = (MultiPartParser, FormParser, JSONParser)
 
-class CreatePostView(TemplateView):
-    template_name = "app/create_post.html"
+# Web
 
 class PostTraceabilityView(TemplateView):
     def get(self, request):
@@ -101,21 +114,31 @@ class PostViewSet(ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
 
-class PostsByUser(generics.ListAPIView):
-    serializer_class = PostsByUserSerializer
-    permission_classes = [IsAuthenticated]
+class PostDetailView(APIView):
 
-    def get_queryset(self):
-        user_id = self.kwargs['user_id']
-        user = get_object_or_404(User, id=user_id)
-        return Post.objects.filter(user=user)
+    def get(self, request, pk):
+        try:
+            post = Post.objects.get(id=pk)
 
+            # Obtenemos los datos relacionados
+            traceability_data = Traceability.objects.filter(post=post).first()
+            dairy_cow_data = DairyCowData.objects.filter(traceability=traceability_data).first()
+            reproductive_data = ReproductiveData.objects.filter(traceability=traceability_data).first()
 
-import stripe
-from django.http import JsonResponse, HttpResponse
-from django.views.decorators.csrf import csrf_exempt
-from .models import Promotion
-from django.conf import settings
+            # Serializamos los datos si existen
+            traceability_serializer = TraceabilitySerializer(traceability_data)
+            dairy_cow_data_serializer = DairyCowDataSerializer(dairy_cow_data)
+            reproductive_data_serializer = ReproductiveDataSerializer(reproductive_data)
+
+            # Respondemos con los datos relacionados
+            return Response({
+                'traceability_data': traceability_serializer.data if traceability_data else None,
+                'dairy_cow_data': dairy_cow_data_serializer.data if dairy_cow_data else None,
+                'reproductive_data': reproductive_data_serializer.data if reproductive_data else None,
+            }, status=status.HTTP_200_OK)
+
+        except Post.DoesNotExist:
+            return Response({"detail": "Post not found"}, status=status.HTTP_404_NOT_FOUND)
 
 @csrf_exempt
 def stripe_webhook(request):
@@ -140,11 +163,6 @@ def stripe_webhook(request):
         promotion.save()
 
     return JsonResponse({'status': 'success'}, status=200)
-
-
-from django.shortcuts import render, redirect, get_object_or_404
-from django.conf import settings
-from .models import Post, Promotion
 
 def promote_post(request, post_id, plan):
     post = get_object_or_404(Post, id=post_id)

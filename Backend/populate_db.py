@@ -326,7 +326,7 @@ def populate_posts(n=100):
 
 def populate_traceabilities(n=20):
     """ Crea registros de trazabilidad falsos. """
-    posts = list(Post.objects.all()[:10])
+    posts = list(Post.objects.all()[:50])
     categories = list(Category.objects.all())
     vaccines = list(Vaccine.objects.all())
 
@@ -411,11 +411,11 @@ def populate_bids(n=50):
 # Ejecuta las funciones de poblamiento
 if __name__ == "__main__":
     print("Poblando la base de datos con datos falsos...")
-    populate_users(5)
+    populate_users(50)
     populate_categories(5)
     populate_vaccines(5)
-    populate_posts(20)
-    populate_traceabilities(10)
-    populate_auctions(6)
-    populate_bids(50)
+    populate_posts(100)
+    populate_traceabilities(50)
+    populate_auctions(30)
+    populate_bids(70)
     print("¡Base de datos poblada exitosamente!")

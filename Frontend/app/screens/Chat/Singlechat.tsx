@@ -137,6 +137,15 @@ const Singlechat = ({navigation} : SinglechatScreenProps) => {
     const [messageList, setMessageList] = useState(ChatData);
     const [message, setMessage] = useState("");
 
+    const route = useRoute();
+    const { presetMessage } = route.params || {};
+
+    useEffect(() => {
+        if (presetMessage) {
+            setMessage(presetMessage);
+        }
+    }, [presetMessage]);
+
     useEffect(() => {
         setMessageList(activeChat.messages)
     }, [activeChat.messages]);

@@ -76,7 +76,7 @@ const Cardstyle2 = ({id,title,image,countnumber,price,onPress,brand,onPress2,wri
                 >
                     <Image
                         style={{height:undefined,width:'100%',aspectRatio:1/1.2,}}
-                        source={image}
+                        src={image}
                     />
                 </View>
             </View>
@@ -89,7 +89,7 @@ const Cardstyle2 = ({id,title,image,countnumber,price,onPress,brand,onPress2,wri
                 <View>
                     <Text style={{...FONTS.fontMedium,fontSize:16,color:colors.title,paddingRight:25}}>{title}</Text>
                     {wishList ? 
-                         <Text style={{...FONTS.fontRegular,fontSize:12,color:'#6A6A6A',marginTop:5}}>Nescafé</Text>
+                         <Text style={{...FONTS.fontRegular,fontSize:12,color:'#6A6A6A',marginTop:5}}>{brand}</Text>
                     :
                     
                         <Text style={{...FONTS.fontRegular,fontSize:12,color:'#6A6A6A',marginTop:5}}>{brand}</Text>
