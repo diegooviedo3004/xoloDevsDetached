@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Post, Bid, PostImage, Promotion, Auction, Category, DairyCowData, ReproductiveData, Traceability, Vaccine
+from .models import Post, Bid, PostImage, Promotion, Auction, Bid, Category, DairyCowData, ReproductiveData, Traceability, Vaccine
 from django.contrib.auth import get_user_model
 
 User = get_user_model()

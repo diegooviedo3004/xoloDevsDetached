@@ -126,6 +126,9 @@ class Post(TimeStampedModel):
     is_approved = models.BooleanField(default=False) 
     is_active = models.BooleanField(default=True)
 
+    def get_related_auction(self):
+        return Auction.objects.filter(post=self).first()
+
     def __str__(self):
         return f"{self.description[:20]} - {self.post_type}"
 
@@ -218,24 +221,58 @@ class PostImage(TimeStampedModel):
         verbose_name = _('imagen del post')
         verbose_name_plural = _('imagenes del post')
 
+from datetime import timedelta, datetime
+
 class Auction(TimeStampedModel):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='bids')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='auction')
     end_date = models.DateTimeField(null=True, blank=True)
 
     def get_highest_bid(self):
         """Get the highest bid placed on this post."""
         highest_bid = self.bids.order_by('-amount').first()
         return highest_bid.amount if highest_bid else None
+        
+    def get_bids(self):
+        """Get the highest bid placed on this post."""
+        return self.bids.order_by('-amount')
 
     def is_auction_active(self):
         """Check if the auction is active based on the end date and current time."""
+        print(type(self.end_date))
+        print(type(timezone.now()))
         return self.end_date > timezone.now()
+
+    def get_next_bids(self):
+        highest_bid = self.get_highest_bid()
+        increment_percentage = 5 / Decimal('100')  # Convert percentage to Decimal
+        next_bids = []
+
+        for i in range(1, 4):  # Get the next 3 bids
+            next_bid = highest_bid * (Decimal('1') + increment_percentage * Decimal(i))
+            next_bids.append(next_bid)
+
+        return next_bids
 
     def get_final_amount(self):
         """Get the highest bid placed on this post."""
         if not self.is_auction_active:
             return self.get_highest_bid
-            
+
+    def get_time_remaining(self):
+        now = datetime.now()
+        if self.end_date > now:
+            time_remaining = self.end_date - now
+            days = time_remaining.days
+            hours, remainder = divmod(time_remaining.seconds, 3600)
+            minutes, seconds = divmod(remainder, 60)
+            return {
+                "days": days,
+                "hours": hours,
+                "minutes": minutes,
+                "seconds": seconds,
+            }
+        return None  # La subasta ya terminó
+
     def __str__(self):
         return f"Subasta para {self.post.title}"
 
@@ -244,11 +281,9 @@ class Auction(TimeStampedModel):
         verbose_name_plural = _('subastas')
 
 class Bid(TimeStampedModel):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     auction = models.ForeignKey(Auction, on_delete=models.CASCADE, related_name='bids')
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-
-    def __str__(self):
-        return f"Bid by {self.user.email} on {self.post.description[:20]} - Amount: {self.amount}"
 
     class Meta:
         ordering = ['-amount']
@@ -256,12 +291,12 @@ class Bid(TimeStampedModel):
         verbose_name_plural = _('ofertas')
 
     def clean(self):
-        if not self.subasta.is_auction_active():
+        if not self.auction.is_auction_active():
             raise ValidationError("No se pueden realizar pujas en una subasta cerrada o fuera de su tiempo activo.")
             
-        highest_bid = self.subasta.get_highest_bid
-        if highest_bid and self.amount <= highest_bid.amount:
-            raise ValidationError(f"El monto de la puja debe ser mayor a la puja anterior de {highest_bid.amount}")
+        highest_bid_var = self.auction.get_highest_bid()
+        if highest_bid_var and self.amount <= highest_bid_var:
+            raise ValidationError(f"El monto de la puja debe ser mayor a la puja anterior de {highest_bid_var}")
 
     def save(self, *args, **kwargs):
         # Ejecutar la validación antes de guardar

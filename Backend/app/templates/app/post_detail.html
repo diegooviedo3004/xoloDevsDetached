@@ -74,6 +74,27 @@
                                             <li class="nav-item" role="presentation">
                                               <button class="nav-link active" id="pills-description-tab" data-bs-toggle="pill" data-bs-target="#pills-description" type="button" role="tab" aria-controls="pills-description" aria-selected="true">Descripción</button>
                                             </li>
+                                            {% if post.post_type == 'Auction' %}
+                                            <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
+                                            <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+                                            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+
+                                            <div id="ex1" class="modal">
+                                                <ul>
+                                                    {% for bid in post.get_related_auction.get_bids %}
+                                                        <li>{{bid.user.email}}</li>
+                                                        <li>{{bid.amount}}</li>
+                                                        <li>Hace {{bid.created_at  | timesince }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                                
+                                                <a href="#" rel="modal:close">Close</a>
+                                              </div>
+                                              
+                                            <li class="nav-item" role="presentation">
+                                                <a class="nav-link active" href="#ex1" rel="modal:open">Historial de pujas</a>
+                                              </li>
+                                            {% endif %}
                                             {% if post.traceability %}
                                             <li class="nav-item" role="presentation">
                                               <button class="nav-link" id="pills-reviews-tab" data-bs-toggle="pill" data-bs-target="#pills-reviews" type="button" role="tab" aria-controls="pills-reviews" aria-selected="false">Trazabilidad</button>
@@ -111,12 +132,79 @@
                                                     <span class="text-gray-700">
                                                         {{ post.description }}
                                                     </span>
-                        
+                                                    
+                                                    {% if post.post_type == 'Post' %}
                                                     <div class="mt-32 flex-align flex-wrap gap-32">
                                                         <div class="flex-align gap-8">
                                                             <h4 class="mb-0">${{ post.starting_price }}</h4>
                                                         </div>
                                                     </div>
+                                                    {% else %}
+                                                    <div class="mt-32 flex-align flex-wrap gap-32">
+                                                        <div class="flex-align gap-8">
+                                                            <div>
+                                                             <p class="mb-0">¿Puja está activa?: {{ post.get_related_auction.is_auction_active|yesno:"Sí,No" }}</p>
+
+                                                            </div>
+                                                            {% if post.get_related_auction.is_auction_active %}
+                                                                    <p class="mb-0">Tiempo restante para la finalización de la subasta:</p>
+                                                                    <p id="countdown"></p>
+                                                                    <script>
+                                                                        // Pasar la fecha de finalización en formato de milisegundos a JavaScript
+                                                                        const endDate = new Date("{{ post.get_related_auction.end_date|date:'Y-m-d H:i:s' }}").getTime();
+                                                                    </script>
+
+                                                                    <script>
+                                                                        // Función de cuenta regresiva
+                                                                        function startCountdown(endDate) {
+                                                                            const countdownElement = document.getElementById("countdown");
+
+                                                                            function updateCountdown() {
+                                                                                const now = new Date().getTime();
+                                                                                const timeRemaining = endDate - now;
+
+                                                                                if (timeRemaining <= 0) {
+                                                                                    countdownElement.innerHTML = "La subasta ha finalizado";
+                                                                                    clearInterval(interval); // Detener el intervalo cuando la cuenta regresiva termina
+                                                                                    return;
+                                                                                }
+
+                                                                                // Calcular días, horas, minutos y segundos
+                                                                                const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+                                                                                const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                                                                                const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+                                                                                const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+
+                                                                                // Mostrar el tiempo restante
+                                                                                countdownElement.innerHTML = `${days} días, ${hours} horas, ${minutes} minutos, ${seconds} segundos`;
+                                                                            }
+
+                                                                            // Actualizar cada segundo
+                                                                            const interval = setInterval(updateCountdown, 1000);
+                                                                        }
+
+                                                                        // Iniciar la cuenta regresiva
+                                                                        startCountdown(endDate);
+                                                                    </script>
+
+                                                            {% endif %}
+                                                            {% if post.get_related_auction.get_highest_bid %}
+                                                            <p class="mb-0">Puja más alta: ${{ post.get_related_auction.get_highest_bid }}</p>
+                                                            <p>Next 3 possible bids:</p>
+                                                            <ul>
+                                                                {% for bid in post.get_related_auction.get_next_bids %}
+                                                                    <li>
+                                              <button class="nav-link active" type="button" role="tab" aria-controls="pills-description" aria-selected="true">{{bid}}</button>
+
+                                                                    </li>
+                                                                {% endfor %}
+                                                            </ul>
+                                                            {% else %}
+                                                            Todavía no hay ninguna puja
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                    {% endif %}
                                                 </div>
                                             </div>
                                             {% if post.traceability %}
