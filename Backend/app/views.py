@@ -19,6 +19,11 @@ class IndexView(ListView):
     template_name = "app/index.html"
     context_object_name = 'posts'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['users'] = User.objects.all()  # Añade todos los usuarios al contexto
+        return context
+
 class CreatePostView(TemplateView):
     template_name = "app/create_post.html"
 
